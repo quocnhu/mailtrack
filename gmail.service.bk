@@ -1,0 +1,1038 @@
+import { Injectable } from '@nestjs/common';
+import { google } from 'googleapis';
+import { GoogleAuth } from 'google-auth-library';
+import * as cheerio from 'cheerio';
+import { GmailStorage } from './gmail.storage';
+
+@Injectable()
+export class GmailService {
+  private oauth2Client;
+
+  constructor(
+    private readonly storage: GmailStorage,
+  ) {
+
+    // =========================================
+    // EXPLICIT GOOGLE CLOUD AUTH
+    // =========================================
+    const googleAuth = new GoogleAuth({
+      keyFile:
+        process.env
+          .GOOGLE_APPLICATION_CREDENTIALS,
+
+      scopes: [
+        'https://www.googleapis.com/auth/cloud-platform',
+      ],
+    });
+
+    console.log(
+      'GOOGLE APPLICATION CREDENTIALS:',
+      process.env
+        .GOOGLE_APPLICATION_CREDENTIALS,
+    );
+
+    // =========================================
+    // GOOGLE OAUTH CLIENT
+    // =========================================
+    this.oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI,
+    );
+  }
+
+  // =========================================
+  // GENERATE GOOGLE LOGIN URL
+  // =========================================
+  generateAuthUrl() {
+
+    return this.oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+
+      scope: [
+        'https://www.googleapis.com/auth/gmail.readonly',
+        'https://www.googleapis.com/auth/gmail.modify',
+      ],
+    });
+  }
+
+  // =========================================
+  // EXCHANGE CODE -> TOKENS
+  // =========================================
+  async getTokens(code: string) {
+
+    const { tokens } =
+      await this.oauth2Client.getToken(code);
+
+    // =========================================
+    // SAVE REFRESH TOKEN
+    // =========================================
+    if (tokens.refresh_token) {
+
+      this.storage.saveRefreshToken(
+        tokens.refresh_token,
+      );
+
+      console.log(
+        'REFRESH TOKEN SAVED',
+      );
+    }
+
+    return tokens;
+  }
+
+  // =========================================
+  // LOAD OAUTH CLIENT
+  // =========================================
+  getOAuthClient() {
+
+    const refreshToken =
+      this.storage.getRefreshToken();
+
+    this.oauth2Client.setCredentials({
+      refresh_token: refreshToken,
+    });
+
+    return this.oauth2Client;
+  }
+
+  // =========================================
+  // START OR RENEW GMAIL WATCH
+  // =========================================
+  async startWatch() {
+
+    const auth = this.getOAuthClient();
+
+    const gmail = google.gmail({
+      version: 'v1',
+      auth,
+    });
+
+    const response =
+      await gmail.users.watch({
+        userId: 'me',
+
+        requestBody: {
+          topicName:
+            process.env
+              .GOOGLE_PUBSUB_TOPIC,
+
+          labelIds: ['INBOX'],
+        },
+      });
+
+    console.log(
+      'GMAIL WATCH STARTED:',
+      response.data,
+    );
+
+    // =========================================
+    // SAVE WATCH EXPIRATION
+    // =========================================
+    if (response.data.expiration) {
+
+      this.storage.saveWatchExpiration(
+        response.data.expiration.toString(),
+      );
+    }
+
+    // =========================================
+    // SAVE INITIAL HISTORY ID
+    // =========================================
+    if (response.data.historyId) {
+
+      this.storage.saveLastHistoryId(
+        response.data.historyId.toString(),
+      );
+    }
+
+    return response.data;
+  }
+
+  // =========================================
+  // GET GMAIL HISTORY
+  // =========================================
+  async getHistory(
+    startHistoryId: string,
+  ) {
+
+    const auth = this.getOAuthClient();
+
+    const gmail = google.gmail({
+      version: 'v1',
+      auth,
+    });
+
+    const history =
+      await gmail.users.history.list({
+        userId: 'me',
+
+        startHistoryId,
+
+        historyTypes: [
+          'messageAdded',
+        ],
+      });
+
+    return history.data;
+  }
+
+  // =========================================
+  // GET FULL EMAIL
+  // =========================================
+  async getMessage(
+    messageId: string,
+  ) {
+
+    const auth = this.getOAuthClient();
+
+    const gmail = google.gmail({
+      version: 'v1',
+      auth,
+    });
+
+    const message =
+      await gmail.users.messages.get({
+        userId: 'me',
+        id: messageId,
+      });
+
+    return message.data;
+  }
+
+  // =========================================
+  // NORMALIZE GMAIL BASE64
+  // =========================================
+  decodeBase64(data: string) {
+
+    return Buffer.from(
+      data
+        .replace(/-/g, '+')
+        .replace(/_/g, '/'),
+      'base64',
+    ).toString('utf8');
+  }
+
+  // =========================================
+  // RECURSIVE MIME PART SEARCH
+  // =========================================
+  findPart(
+    parts: any[],
+    mimeType: string,
+  ): any {
+
+    for (const part of parts || []) {
+
+      if (
+        part.mimeType === mimeType
+      ) {
+        return part;
+      }
+
+      if (part.parts) {
+
+        const nested =
+          this.findPart(
+            part.parts,
+            mimeType,
+          );
+
+        if (nested) {
+          return nested;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // =========================================
+  // SAFE REGEX EXTRACT
+  // =========================================
+  extract(
+    text: string,
+    regex: RegExp,
+  ) {
+
+    return text
+      ?.match(regex)?.[1]
+      ?.replace(/\s+/g, ' ')
+      ?.trim();
+  }
+
+  // =========================================
+  // PARSE EMAIL CONTENT
+  // =========================================
+  parseEmail(message: any) {
+
+    const headers =
+      message.payload?.headers || [];
+
+    const getHeader = (
+      name: string,
+    ) =>
+      headers.find(
+        (h: any) => h.name === name,
+      )?.value;
+
+    // =========================================
+    // RECURSIVE MIME SEARCH
+    // =========================================
+    const findPart = (
+      parts: any[],
+      mimeType: string,
+    ): any => {
+
+      for (const part of parts || []) {
+
+        if (
+          part.mimeType === mimeType
+        ) {
+          return part;
+        }
+
+        if (part.parts) {
+
+          const nested =
+            findPart(
+              part.parts,
+              mimeType,
+            );
+
+          if (nested) {
+            return nested;
+          }
+        }
+      }
+
+      return null;
+    };
+
+    // =========================================
+    // FIND MIME PARTS
+    // =========================================
+    const htmlPart =
+      findPart(
+        message.payload?.parts || [],
+        'text/html',
+      );
+
+    const textPart =
+      findPart(
+        message.payload?.parts || [],
+        'text/plain',
+      );
+
+    let html = '';
+    let body = '';
+
+    // =========================================
+    // HTML CONTENT
+    // =========================================
+    if (htmlPart?.body?.data) {
+
+      html = this.decodeBase64(
+        htmlPart.body.data,
+      );
+    }
+
+    // =========================================
+    // TEXT CONTENT
+    // =========================================
+    if (textPart?.body?.data) {
+
+      body = this.decodeBase64(
+        textPart.body.data,
+      );
+    }
+
+    // =========================================
+    // LOAD HTML
+    // =========================================
+    const $ = cheerio.load(html);
+    // =========================================
+    // WEBSITE BOOKING PARSER
+    // =========================================
+
+    // =========================================
+    // TOUR NAME
+    // =========================================
+    const tourName =
+      $('b')
+        .first()
+        .text()
+        .trim() || null;
+
+    // =========================================
+    // PACKAGE NAME
+    // =========================================
+    let packageName = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Package Name') {
+        packageName = value;
+      }
+    });
+
+    // =========================================
+    // TRIP DATE
+    // =========================================
+    let tripDate = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Trip Date') {
+        tripDate = value;
+      }
+    });
+
+    // =========================================
+    // TRAVELLERS
+    // =========================================
+    let travellers = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Travellers') {
+        travellers = value;
+      }
+    });
+
+    // =========================================
+    // ADULT
+    // =========================================
+    let adult = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Adult') {
+        adult = value;
+      }
+    });
+
+    // =========================================
+    // CHILD
+    // =========================================
+    let child = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Child 5-11 Yrs') {
+        child = value;
+      }
+    });
+
+    // =========================================
+    // INFANT
+    // =========================================
+    let infant = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Infant 1-4 Yrs FOC') {
+        infant = value;
+      }
+    });
+
+    // =========================================
+    // TOTAL PRICE
+    // =========================================
+    let totalPrice = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Total') {
+        totalPrice = value;
+      }
+    });
+
+    // =========================================
+    // CUSTOMER NAME
+    // =========================================
+    let customerName = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Name') {
+        customerName = value;
+      }
+    });
+
+    // =========================================
+    // CUSTOMER EMAIL
+    // =========================================
+    let customerEmail = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Email') {
+        customerEmail = value;
+      }
+    });
+
+    // =========================================
+    // ADDRESS
+    // =========================================
+    let address = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Billing Address') {
+        address = value;
+      }
+    });
+
+    // =========================================
+    // CITY
+    // =========================================
+    let city = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'City') {
+        city = value;
+      }
+    });
+
+    // =========================================
+    // COUNTRY
+    // =========================================
+    let country = null;
+
+    $('tr').each((_, row) => {
+
+      const cols = $(row).find('td');
+
+      const key =
+        $(cols[0]).text().trim();
+
+      const value =
+        $(cols[1]).text().trim();
+
+      if (key === 'Country') {
+        country = value;
+      }
+    });
+
+    // =========================================
+    // CLEAN WEBSITE JSON
+    // =========================================
+    const websiteBooking = {
+
+      tourName,
+
+      packageName,
+
+      tripDate,
+
+      travellers,
+
+      pricing: {
+
+        adult,
+
+        child,
+
+        infant,
+
+        totalPrice,
+      },
+
+      customer: {
+
+        name:
+          customerName,
+
+        email:
+          customerEmail,
+
+        address,
+
+        city,
+
+        country,
+      },
+    };
+
+    console.log(
+      'WEBSITE BOOKING:',
+      JSON.stringify(
+        websiteBooking,
+        null,
+        2,
+      ),
+    );
+
+    // =========================================
+    // FIND MAIN BOOKING TABLE (TRIPADVISOR)
+    // =========================================
+    let bookingTable: any = null;
+
+    $('table').each((_, table) => {
+
+      const text =
+        $(table).text();
+
+      if (
+        text.includes('Booking ref.') &&
+        text.includes('Customer') &&
+        text.includes('Product')
+      ) {
+
+        bookingTable = table;
+
+        return false;
+      }
+    });
+
+    // =========================================
+    // EXTRACT TABLE ROWS
+    // =========================================
+    const bookingData: Record<
+      string,
+      string
+    > = {};
+
+    if (bookingTable) {
+
+      $(bookingTable)
+        .find('tr')
+        .each((_, row) => {
+
+          const cols =
+            $(row).find('td');
+
+          if (cols.length < 2) {
+            return;
+          }
+
+          const key =
+            $(cols[0])
+              .text()
+              .replace(/\s+/g, ' ')
+              .trim();
+
+          const value =
+            $(cols[1])
+              .text()
+              .replace(/\s+/g, ' ')
+              .trim();
+
+          if (!key || !value) {
+            return;
+          }
+
+          bookingData[key] =
+            value;
+        });
+    }
+
+    // =========================================
+    // CLEAN JSON FOR TRIPADVISOR 
+    // =========================================
+    const booking = {
+
+      bookingRef:
+        bookingData[
+        'Booking ref.'
+        ] || null,
+
+      productBookingRef:
+        bookingData[
+        'Product booking ref.'
+        ] || null,
+
+      externalBookingRef:
+        bookingData[
+        'Ext. booking ref'
+        ] || null,
+
+      product:
+        bookingData[
+        'Product'
+        ] || null,
+
+      supplier:
+        bookingData[
+        'Supplier'
+        ] || null,
+
+      soldBy:
+        bookingData[
+        'Sold by'
+        ] || null,
+
+      bookingChannel:
+        bookingData[
+        'Booking channel'
+        ] || null,
+
+      customer: {
+
+        name:
+          bookingData[
+          'Customer'
+          ] || null,
+
+        email:
+          bookingData[
+          'Customer email'
+          ] || null,
+
+        phone:
+          bookingData[
+          'Customer phone'
+          ] || null,
+      },
+
+      tour: {
+
+        date:
+          bookingData[
+          'Date'
+          ] || null,
+
+        rate:
+          bookingData[
+          'Rate'
+          ] || null,
+
+        pax:
+          bookingData[
+          'PAX'
+          ] || null,
+
+        pickup:
+          bookingData[
+          'Pick-up'
+          ] || null,
+
+        guidedLanguages:
+          bookingData[
+          'Guided languages'
+          ] || null,
+      },
+
+      extras:
+        bookingData[
+        'Extras'
+        ] || null,
+
+      created:
+        bookingData[
+        'Created'
+        ] || null,
+
+      notes:
+        bookingData['Notes'] || null,
+
+      price:
+        bookingData['Notes']
+          ?.match(
+            /Viator amount:\s*([A-Z]{3}\s*\d+(\.\d+)?)/,
+          )?.[1] || null,
+    };
+
+    return {
+
+      id: message.id,
+
+      threadId:
+        message.threadId,
+
+      subject:
+        getHeader('Subject'),
+
+      from:
+        getHeader('From'),
+
+      to:
+        getHeader('To'),
+
+      date:
+        getHeader('Date'),
+
+      snippet:
+        message.snippet,
+
+      booking,
+      // html, // full HTML content (for debugging)
+      websiteBooking
+    };
+  }
+  // =========================================
+  // PROCESS HISTORY EVENTS
+  // =========================================
+  async processHistory(
+    historyId: string,
+  ) {
+
+    try {
+
+      const lastHistoryId =
+        this.storage.getLastHistoryId();
+
+      const history =
+        await this.getHistory(
+          lastHistoryId || historyId,
+        );
+
+      const histories =
+        history.history || [];
+
+      for (const item of histories) {
+
+        const messagesAdded =
+          item.messagesAdded || [];
+
+        for (const added of messagesAdded) {
+
+          const msg =
+            added.message;
+
+          if (!msg?.id) {
+            continue;
+          }
+
+          const messageId =
+            msg.id;
+
+          // =========================================
+          // PREVENT DUPLICATES
+          // =========================================
+          if (
+            this.storage.isProcessedMessage(
+              messageId,
+            )
+          ) {
+            continue;
+          }
+
+          // =========================================
+          // FETCH FULL EMAIL
+          // =========================================
+          const fullMessage =
+            await this.getMessage(
+              messageId,
+            );
+
+          // =========================================
+          // PARSE EMAIL
+          // =========================================
+          const parsedEmail =
+            this.parseEmail(
+              fullMessage,
+            );
+
+          // =========================================
+          // FINAL RESULT
+          // =========================================
+          console.log(
+            'PARSED EMAIL:',
+            JSON.stringify(
+              parsedEmail,
+              null,
+              2,
+            ),
+          );
+
+          // =========================================
+          // SAVE PROCESSED MESSAGE
+          // =========================================
+          this.storage.saveProcessedMessage(
+            messageId,
+          );
+        }
+      }
+
+      // =========================================
+      // UPDATE HISTORY ID
+      // =========================================
+      this.storage.saveLastHistoryId(
+        historyId.toString(),
+      );
+
+    } catch (error) {
+
+      console.error(
+        'PROCESS HISTORY ERROR:',
+        error,
+      );
+    }
+  }
+
+  // =========================================
+  // HANDLE PUBSUB WEBHOOK
+  // =========================================
+  async handleWebhook(body: any) {
+
+    try {
+
+      console.log(
+        'PUBSUB BODY:',
+        body,
+      );
+
+      const base64Data =
+        body.message?.data;
+
+      // =========================================
+      // VALIDATE PUBSUB DATA
+      // =========================================
+      if (!base64Data) {
+
+        return {
+          success: false,
+          message:
+            'No PubSub data received',
+        };
+      }
+
+      // =========================================
+      // DECODE PUBSUB
+      // =========================================
+      const decoded = JSON.parse(
+        Buffer.from(
+          base64Data,
+          'base64',
+        ).toString(),
+      );
+
+      console.log(
+        'DECODED PUBSUB:',
+        decoded,
+      );
+
+      // =========================================
+      // VALIDATE HISTORY ID
+      // =========================================
+      if (!decoded.historyId) {
+
+        return {
+          success: false,
+          message:
+            'No historyId found',
+        };
+      }
+
+      // =========================================
+      // NORMALIZE HISTORY ID
+      // =========================================
+      const historyId =
+        decoded.historyId.toString();
+
+      // =========================================
+      // PROCESS HISTORY
+      // =========================================
+      await this.processHistory(
+        historyId,
+      );
+
+      return {
+        success: true,
+      };
+
+    } catch (error: any) {
+
+      console.error(
+        'WEBHOOK ERROR:',
+        error,
+      );
+
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+  }
+}
