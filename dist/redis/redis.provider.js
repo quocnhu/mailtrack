@@ -9,6 +9,7 @@ exports.RedisProvider = {
     provide: 'REDIS_CLIENT',
     useFactory: () => {
         const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+        console.log('Creating Redis client');
         const client = new ioredis_1.default(redisUrl);
         client.on('connect', () => {
             console.log('🚀 [Redis] Connected successfully to cache cluster!');

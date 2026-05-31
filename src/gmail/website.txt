@@ -1,0 +1,188 @@
+html <div dir="auto"><div><div class="gmail_quote"><div dir="auto"><div class="gmail_quote" dir="auto"><blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir="auto"><div><div class="gmail_quote"><blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir="auto"><div class="gmail_quote" dir="auto"><div dir="ltr" class="gmail_attr"><br></div><blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir="auto"><div class="gmail_quote" dir="auto"><blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir="auto"><div class="gmail_quote" dir="auto"><blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div class="gmail_quote"><div dir="ltr"><div class="gmail_quote"><div>   <u></u>
+
+
+
+
+
+
+
+
+        <div>
+                <table>
+                        <tbody><tr>
+                                <td></td>
+                                <td width="600">
+                                        <div>
+                                                <table width="100%" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>
+<table width="100%" cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td>
+<h1>New Booking</h1>
+</td>
+</tr>
+<tr>
+<td>
+<table>
+<tbody>
+<tr>
+<td style="margin:0;padding:5px 0" valign="top">Dear Admin,
+
+A new booking has been made on your website. Booking details are listed below.</td>
+</tr>
+<tr>
+<td style="margin:0;padding:5px 0" valign="top">
+<table cellspacing="0" cellpadding="0">
+<tbody>
+<tr>
+<td style="margin:0" colspan="2" valign="top">
+<h3>Booking Trips (1)</h3>
+</td>
+</tr>
+<tr>
+<td colspan="2">                <table width="100%" cellpadding="0" cellspacing="0">
+                    <tbody><tr>
+                        <td colspan="2"><b>Cu Chi Ben Duoc Tunnels: Authentic &amp; Less Touristy</b></td>
+                    </tr>
+                    <tr>
+                        <td>Package Name</td>
+                        <td>Shared Group Of 10 Max 7:30 AM</td>
+                    </tr>
+                    <tr>
+                        <td>Trip Date</td>
+                        <td>2026-04-13</td>
+                    </tr>
+                                                                                <tr>
+                                                <td>Travellers</td>
+                                                <td>5</td>
+                                        </tr>
+                                        <tr>
+                                                <td>Trip Cost</td>
+                                        </tr>
+                                        <tr>
+                                                <td> </td>
+                                                <td>
+                                                        <table width="100%" cellpadding="0" cellspacing="0">
+                                                                                                                                        <tbody><tr>
+                                                                                <td>Adult</td>
+                                                                                <td>2 X $25 = $50</td>
+                                                                        </tr>
+                                                                                                                                                <tr>
+                                                                                <td>Infant 1-4 Yrs FOC</td>
+                                                                                <td>1 X $0 = $0</td>
+                                                                        </tr>
+                                                                                                                                                <tr>
+                                                                                <td>Child 5-11 Yrs</td>
+                                                                                <td>2 X $20 = $40</td>
+                                                                        </tr>
+                                                                                                                                        <tr>
+                                                                        <td width="50%">Subtotal</td>
+                                                                        <td width="50%">$90</td>
+                                                                </tr>
+                                                        </tbody></table>
+                                                </td>
+                                        </tr>
+                                                                                                                </tbody></table>
+                                <hr>                    <table width="100%">
+                                <tbody><tr>
+                                        <td width="50%"> </td>
+                                        <td width="50%">
+                                                <table width="100%">
+                                                        <tbody><tr>
+                                                                <td>Subtotal</td>
+                                                                <td>$90</td>
+                                                        </tr>
+                                                        <tr>
+                                                                <td>Discount</td>
+                                                                                                                                <td>
+                                                                        $0                                                              </td>
+                                                        </tr>
+                                                                                                                                                                                              <tr>
+                                                                <td>Total</td>
+                                                                <td>
+                                                                        $90                                                                                                                   </td>
+                                                        </tr>
+                                                </tbody></table>
+                                        </td>
+                                </tr>
+                        </tbody></table>
+                </td>
+</tr>
+<tr>
+<td style="margin:0" valign="top">
+<h3>Billing Details</h3>
+</td>
+</tr>
+<tr>
+<td>Name</td>
+<td>Rikke Nord</td>
+</tr>
+<tr>
+<td>Email</td>
+<td><a href="mailto:rikke@nord.dk" rel="noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer" target="_blank">rikke@nord.dk</a></td>
+</tr>
+<tr>
+<td>Billing Address</td>
+<td>Sherwood Residence, <a href="https://www.google.com/maps/search/127+Pasteur?entry=gmail&amp;source=g" rel="noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer" target="_blank">127 Pasteur</a> Street, Distrikt 3, Ho Chi Minh City</td>
+</tr>
+<tr>
+<td>City</td>
+<td>004520888461</td>
+</tr>
+<tr>
+<td>Country</td>
+<td></td>
+</tr>
+
+<tr>
+<td colspan="2"></td>
+</tr>
+
+<tr>
+<td colspan="2"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+<tr>
+<td><a href="https://hanatourist.vip/wp-admin/post.php?post=3286&amp;action=edit" rel="noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer" target="_blank">View booking on your website site</a></td>
+</tr>
+<tr>
+<td>Hanatourist</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>                                                <div>
+                                                                                                                <table width="100%">
+                                                                <tbody><tr>
+                                                                        <td>Powered By: <a href="https://wptravelengine.com" rel="noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer" target="_blank">WP Travel Engine</a></td>
+                                                                </tr>
+                                                        </tbody></table>
+                                                                                                        </div>
+                                        </div>
+                                </td>
+                                <td></td>
+                        </tr>
+                </tbody></table>
+        </div>
+
+
+</div></div></div>
+</div>
+</blockquote></div></div>
+</blockquote></div></div>
+</blockquote></div></div>
+</blockquote></div></div></div>
+</blockquote></div></div>
+</div></div></div>

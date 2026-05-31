@@ -6,7 +6,7 @@ export const RedisProvider: Provider = {
   useFactory: () => {
     // Falls back to localhost if the variable isn't loaded yet
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-
+    console.log('Creating Redis client');
     // ioredis accepts the entire connection URL string directly here!
     const client = new Redis(redisUrl);
 

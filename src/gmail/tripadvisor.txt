@@ -1,0 +1,292 @@
+html <div dir="auto"><div><div class="gmail_quote"><div dir="auto"><div class="gmail_quote" dir="auto"><blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir="auto"><div class="gmail_quote" dir="auto"><div dir="auto"><div class="gmail_quote" dir="auto"><div dir="auto"><div class="gmail_quote" dir="auto"><blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div class="gmail_quote"><div dir="ltr"><div class="gmail_quote"><div dir="ltr" class="gmail_attr"><br></div><div><div marginwidth="0" marginheight="0" style="font-size:14px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif"><div style="font-size:14px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif">The following booking was just created.</div>
+
+        <div style="margin-top:15px;font-size:14px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif"><div>
+<table style="border-collapse:collapse;width:auto;display:inline-block;border:1px solid black">
+    <tbody>
+        <tr>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px;padding-top:20px"><strong>Booking ref.</strong></td>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px;padding-top:20px">VIA-91235617</td>
+        </tr>
+        <tr>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Product booking ref.</strong></td>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px"><a href="https://hanatourist.bokun.io/bookings/activity/130151029" rel="noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer" target="_blank">Hana-T130151029</a></td>
+        </tr>
+        
+            <tr>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Ext. booking ref</strong></td>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px">1394584387</td>
+            </tr>
+        
+        <tr>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Product</strong></td>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px">
+                
+                    107622P40 -
+                
+                Cu Chi-Ben Duoc Tunnels &amp; War Remnants Museum – Small Group
+            </td>
+        </tr>
+        
+        <tr>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Supplier</strong></td>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px">HANA TOURIST</td>
+        </tr>
+        
+        
+            <tr>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Sold by</strong></td>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px">
+
+                                                Viator.com
+
+                </td>
+            </tr>
+        
+        <tr>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px;padding-bottom:20px"><strong>Booking channel</strong></td>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px;padding-bottom:20px">
+
+
+                                                Viator.com
+
+
+            </td>
+        </tr>
+        <tr>
+            <td style="border-top:1px solid black;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px;padding-top:20px"><strong>Customer</strong></td>
+            <td style="border-top:1px solid black;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px;padding-top:20px">
+                MUNRO, Rowland
+            </td>
+        </tr>
+        
+            <tr>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Customer email</strong></td>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px"><a href="mailto:S-9d0cc5b9d0ea4f02bb6cab444223fd1a%2B1394584387-2z2xjcchm2sqp@expmessaging.tripadvisor.com" rel="noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer" target="_blank">S-9d0cc5b9d0ea4f02bb6cab444223fd1a+1394584387-2z2xjcchm2sqp@expmessaging.tripadvisor.com</a></td>
+            </tr>
+        
+        
+            <tr>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Customer phone</strong></td>
+                <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px">+61409082488</td>
+            </tr>
+        
+        
+        
+        
+            
+    <tr>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px"><strong>Date</strong></td>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px 10px">
+            Mon 8.Jun &#39;26
+            
+                
+                    @ 07:30
+                
+            
+            
+        </td>
+    </tr>
+    
+    <tr>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px 8px 6px 6px"><strong>Rate</strong></td>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px 10px">
+            Shared Group Of 10 Max 
+        </td>
+    </tr>
+    
+    <tr>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px 8px 6px 6px"><strong>PAX</strong></td>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px 10px">
+            
+                
+                    2 Adult
+                
+            
+        </td>
+    </tr>
+
+    
+        <tr>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px 8px 6px 6px;vertical-align:top"><strong>Pick-up</strong></td>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px 10px;vertical-align:top">
+                
+                    <div>Liberty Central Saigon Riverside Hotel</div>
+                
+                
+                
+            </td>
+        </tr>
+    
+
+
+    
+
+    
+
+    
+    <tr>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px 8px 6px 6px;vertical-align:top"><strong>Guided languages</strong></td>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px 10px;vertical-align:top">
+            (Guided language: English)
+        </td>
+    </tr>
+    
+
+    
+        
+    <tr>
+        <td style="max-width:180px;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px 8px 6px 6px;vertical-align:top"><strong>Extras</strong></td>
+        <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px 10px;vertical-align:top">
+            
+                
+            
+                
+            
+        </td>
+    </tr>
+
+    
+
+    
+        
+    
+    
+    
+
+    
+        
+            
+        
+            
+        
+    
+
+    
+
+    
+
+
+
+
+
+
+
+        
+        
+
+        
+
+        <tr>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:#e9e9e9;text-align:right;padding:6px;padding-left:6px;padding-right:8px;padding-bottom:20px"><strong>Created</strong></td>
+            <td style="font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px;padding-bottom:20px">Fri, May 08 2026 @ 01:25</td>
+        </tr>
+        
+
+
+    
+    
+        <tr>
+            <td style="border-top:1px solid black;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;text-align:right;padding:6px;padding-left:6px;padding-right:8px;padding-top:20px;vertical-align:top"><strong>Notes</strong></td>
+            <td style="border-top:1px solid black;font-family:&#39;Helvetica Neue&#39;,Helvetica,Arial,sans-serif;background-color:white;padding:6px;padding-left:10px;padding-right:10px;padding-top:20px;padding-bottom:20px">
+                
+                    <div>
+
+    
+        
+        --- Inclusions: --- 
+    
+        
+            <br>
+        
+        Hotel pickup &amp; drop-off (selected area)
+    
+        
+            <br>
+        
+        Comfortable air-conditioned van
+    
+        
+            <br>
+        
+        English-speaking guide
+    
+        
+            <br>
+        
+        All entrance fees included (no hidden costs)
+    
+        
+            <br>
+        
+        Tapioca &amp; tea tasting
+    
+        
+            <br>
+        
+        Bottled water, a tissue
+    
+        
+            <br>
+        
+        Entry/Admission - Ben Duoc tunnel complex
+    
+        
+            <br>
+        
+        Entry/Admission - War Remnants Museum
+    
+        
+            <br>
+        
+        
+    
+        
+            <br>
+        
+        --- Booking languages: --- 
+    
+        
+            <br>
+        
+        GUIDE : English
+    
+</div>
+                
+                    <div>
+
+    
+        
+        Viator amount: USD 39.96
+    
+</div>
+                
+            </td>
+        </tr>
+    
+
+
+
+
+    </tbody>
+</table>
+
+    <div>
+    <p> Want $50 in Bókun credit?</p>
+    <p> You get $50 in Bókun credit and your friend gets 50% off a paid plan for 3 months if they subscribe to a paid plan using your
+        <a href="https://extranet.bokun.io/v2/settings/referrals?utm_source=referral_program&amp;utm_medium=email&amp;utm_campaign=supplier_notification" rel="noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer noreferrer" target="_blank"> personal referral link.</a> <span style="font-size:12px"> T&amp;C apply</span>
+    </p>
+</div>
+
+
+
+</div>
+</div>
+
+<img src="https://ea.pstmrk.it/open?m=v3_1.3ODE5JkBsorp7DG2Et84eA.KGhtywVnMof4738VbZFVqcCl4ejeL7clqKi8E-MSkdMAKrAbwLnIlDx19USi5elVSRGLr5CaohLZiK368t-FWB_s892fM2Jt2UtNCk499FXSgUvCSyi6cSeDck9yec7wYP0N82hgLsLV2pcdTI5vIxJkz2BvzeQGr-8ty0wIyridMBKYMU18UKWoGMOf2BJAOYuulG0vGY5R4azyFkVpqNxytuCbf8bWmzG055-NKbwh94Lrvh1L1x6wE4Wyd4OncDDTJEV7cPI_AMKVBfHZnFi0AllepofRKMvl7sHhoGl3pFzdIOry-8B40QT8VCp8mOZ_iVxZuq3MbUhE1OzgpG33j3sFnKfqieXKNYtvPcS3FKD7YkSoQYsFsqkRs1CqIc5i1Isl66CJwHSKR_VcgHdh4OBhCA0wOzTl1CJigyMcFUsoGn68D3RQG3DN3wvw0WUxSJy6NBtfVdD_g97kQ6ZUfC7_LrKFZO9ulkjx04Ssnz7aErN5fTtW89kvlvw5_U6ewZ5eyhLzbsZ5PAN-23tgjHWqLOCy6stKJJe6GllYir78kibTAnzFqLcqkRu6LP0y0k6qV0rVWbIJiE9cTambMMHH1pKSdJ9P-grCPd9ebio0O_tfK8AtsudSi9mgKDJ1Sq_nLksDADO7Z4k36kj0bBzBlb5ykpNOs4tdwks" width="1" height="1" border="0" alt=""></div>
+</div></div></div>
+</div>
+</blockquote></div></div>
+</div></div>
+</div></div>
+</blockquote></div></div>
+</div></div></div>

@@ -1,12 +1,10 @@
 import { OnApplicationBootstrap } from '@nestjs/common';
 import { PrismaService } from "../prisma/prisma.service";
-import { RedisService } from "../redis/redis.service";
 export declare class GmailService implements OnApplicationBootstrap {
     private readonly prisma;
-    private readonly redisService;
     private readonly logger;
     private oauth2Client;
-    constructor(prisma: PrismaService, redisService: RedisService);
+    constructor(prisma: PrismaService);
     onApplicationBootstrap(): Promise<void>;
     getAuthUrl(): Promise<string>;
     handleAuthorizationCode(code: string): Promise<{
@@ -21,6 +19,9 @@ export declare class GmailService implements OnApplicationBootstrap {
     }>;
     processWebhookPayload(base64Data: string): Promise<void>;
     private processMessage;
-    private extractExternalId;
+    private decodeBase64Url;
+    private extractParts;
+    private stripHtml;
+    private detectProvider;
     private parseEmailBody;
 }
