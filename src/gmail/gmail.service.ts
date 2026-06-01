@@ -2,7 +2,9 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { google } from 'googleapis';
 import { PrismaService } from '@/prisma/prisma.service';
 import * as cheerio from 'cheerio';
-import { ParsedEmailDto, EmailProvider } from '@/gmail/dto/parsed-email.dto';
+import { ParsedEmailDto} from '@/gmail/dto/parsedEmail.dto';
+import { TripAdvisorHtmlParser } from '@/gmail/parsers/tripadvisorHtmlParser';
+import { WebsiteHtmlParser } from '@/gmail/parsers/websiteHtmlParser';
 
 @Injectable()
 export class GmailService implements OnApplicationBootstrap {
@@ -148,18 +150,20 @@ export class GmailService implements OnApplicationBootstrap {
       const message = await gmail.users.messages.get({ userId: 'me', id: messageId });
       const parsed: ParsedEmailDto = this.parseEmailBody(message.data);
 
-      console.log('--- Parsed Email ---');
-      console.log('Provider    :', parsed.provider);
-      console.log('Subject     :', parsed.subject);
-      console.log('From        :', parsed.from);
-      console.log('Date        :', parsed.date);
-      console.log('Snippet     :', parsed.snippet);
-      console.log('Clean body preview:\n', parsed.cleanBody?.slice(0, 500));
-      console.log('--------------------');
-      console.log('Full raw message data:', message.data);
-      console.log('html', parsed.htmlBody);
-      console.log('--------------------');
-      console.log('all in one and unparsed', message.data);
+      console.log('--- Parsed Email ---', parsed);
+
+      // console.log('--- Parsed Email ---');
+      // console.log('Provider    :', parsed.provider);
+      // console.log('Subject     :', parsed.subject);
+      // console.log('From        :', parsed.from);
+      // console.log('Date        :', parsed.date);
+      // console.log('Snippet     :', parsed.snippet);
+      // console.log('Clean body preview:\n', parsed.cleanBody?.slice(0, 500));
+      // console.log('--------------------');
+      // console.log('Full raw message data:', message.data);
+      // console.log('html', parsed.htmlBody);
+      // console.log('--------------------');
+      // console.log('all in one and unparsed', message.data);
     } catch (error) {
       this.logger.error(`Error processing message ${messageId}:`, error);
     }
@@ -195,7 +199,7 @@ export class GmailService implements OnApplicationBootstrap {
     return $.text().replace(/\s{2,}/g, ' ').trim();
   }
 
-  private detectProvider(headers: Record<string, string>): EmailProvider {
+  private detectProvider(headers: Record<string, string>): 'tripadvisor' | 'website' | 'unknown' {
     const senderFields = [
       headers['from']        ?? '',
       headers['reply-to']    ?? '',
@@ -203,14 +207,30 @@ export class GmailService implements OnApplicationBootstrap {
       headers['return-path'] ?? '',
     ].join(' ').toLowerCase();
 
-    if (senderFields.includes('tripadvisor.com')) return 'tripadvisor';
-    if (senderFields.includes('yourdomain.com'))  return 'website';
+    if (senderFields.includes('nquocnhu95tourguide@gmail.com')) return 'tripadvisor';
+    if (senderFields.includes('yourdomain.com')) return 'website';
 
     return 'unknown';
   }
 
+  /**
+   * Routes the HTML body to the correct parser based on detected provider
+   */
+  private parseBookingData(provider: string, htmlBody: string | null): any {
+    if (!htmlBody) return null;
+
+    switch (provider) {
+      case 'tripadvisor':
+        return TripAdvisorHtmlParser.parse(htmlBody);
+      case 'website':
+        return WebsiteHtmlParser.parse(htmlBody);
+      default:
+        return null;
+    }
+  }
+
   private parseEmailBody(messageData: any): ParsedEmailDto {
-    // ── Stage 1: decode & extract MIME parts ──────────────────────────)
+    // ── Stage 1: Decode & Extract MIME Parts ──────────────────────────
     const allParts  = this.extractParts(messageData.payload);
     const plainPart = allParts.find((p) => p.mimeType === 'text/plain');
     const htmlPart  = allParts.find((p) => p.mimeType === 'text/html');
@@ -221,14 +241,17 @@ export class GmailService implements OnApplicationBootstrap {
     // Prefer plain text; fall back to cheerio-stripped HTML
     const cleanBody = textBody ?? (htmlBody ? this.stripHtml(htmlBody) : null);
 
-    // ── Stage 2: structure headers ─────────────────────────────────────
+    // ── Stage 2: Structure Headers ─────────────────────────────────────
     const headers: Record<string, string> = {};
     for (const h of messageData.payload?.headers ?? []) {
       headers[h.name.toLowerCase()] = h.value;
     }
 
-    // ── Stage 3: provider detection ────────────────────────────────────
+    // ── Stage 3: Provider Detection ────────────────────────────────────
     const provider = this.detectProvider(headers);
+
+    // ── Stage 4: Deep Structure Scraping (NEW) ──────────────────────────
+    const bookingData = this.parseBookingData(provider, htmlBody);
 
     return {
       subject:      headers['subject']       ?? null,
@@ -242,204 +265,7 @@ export class GmailService implements OnApplicationBootstrap {
       htmlBody,
       cleanBody,
       provider,
-      bookingData:  null, // Placeholder for future structured data extraction
-      rawFallback:  cleanBody, // Store cleanBody as fallback if structured extraction fails
+      bookingData, // ✅ Extracted structured data automatically populates here!
     };
   }
 }
-// import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common'; // ◄ Added OnApplicationBootstrap interface
-// import { google } from 'googleapis';
-// import { PrismaService } from '@/prisma/prisma.service';
-// import { RedisService } from '@/redis/redis.service';
-
-// @Injectable()
-// export class GmailService implements OnApplicationBootstrap { // ◄ Implements the lifecycle hook
-//   private readonly logger = new Logger(GmailService.name);
-//   private oauth2Client = new google.auth.OAuth2(
-//     process.env.GOOGLE_CLIENT_ID,
-//     process.env.GOOGLE_CLIENT_SECRET,
-//     process.env.GOOGLE_REDIRECT_URI
-//   );
-
-//   constructor(
-//     private readonly prisma: PrismaService,
-//     private readonly redisService: RedisService,
-//   ) {
-//     this.oauth2Client.on('tokens', (tokens) => {
-//       if (tokens.access_token) {
-//         this.logger.log('Access token rotated hiddenly by Google SDK.');
-//       }
-//     });
-//   }
-  
-//   // ◄ NEW FUNCTION: Automatically executes when your app boots up
-//   async onApplicationBootstrap() {
-//     try {
-//       const testuser = await this.prisma.user.findFirst();
-//       const account = await this.prisma.gmailAccount.findFirst();
-      
-//       if (!account) {
-//         this.logger.warn('⚠️ No active Google Accounts found in database!');
-//         const loginUrl = await this.getAuthUrl();
-//         this.logger.log(`👉 Please authorize the app by visiting this URL: \n${loginUrl}`);
-//       } else {
-//         this.logger.log(`✅ System connected. Tracking active mailbox for: ${account.email}`);
-//       }
-//     } catch (error) {
-//       this.logger.error('Failed to run startup database check:', error);
-//     }
-//   }
-
-//   async getAuthUrl(): Promise<string> {
-//     return this.oauth2Client.generateAuthUrl({
-//       access_type: 'offline',
-//       prompt: 'consent',
-//       scope: ['https://www.googleapis.com/auth/gmail.readonly'],
-//     });
-//   }
-
-//   async handleAuthorizationCode(code: string) {
-//     const { tokens } = await this.oauth2Client.getToken(code);
-//     this.oauth2Client.setCredentials(tokens);
-
-//     const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
-//     const profile = await gmail.users.getProfile({ userId: 'me' });
-    
-//     const email = profile.data.emailAddress?.toLowerCase();
-//     if (!email) throw new Error('Could not retrieve email address from Google profile.');
-
-//     const watchResult = await gmail.users.watch({
-//       userId: 'me',
-//       requestBody: { topicName: process.env.GOOGLE_PUBSUB_TOPIC },
-//     });
-
-//     const lastHistoryId = String(profile.data.historyId);
-//     const watchExpiration = new Date(Number(watchResult.data.expiration));
-
-//     return await this.prisma.gmailAccount.upsert({
-//       where: { email },
-//       update: {
-//         lastHistoryId,
-//         watchExpiration,
-//         refreshToken: tokens.refresh_token || undefined, 
-//       },
-//       create: {
-//         email,
-//         lastHistoryId,
-//         watchExpiration,
-//         refreshToken: tokens.refresh_token || '',
-//       },
-//     });
-//   }
-
-//   async processWebhookPayload(base64Data: string): Promise<void> {
-//     try {
-//       const rawData = Buffer.from(base64Data, 'base64').toString('utf-8');
-//       const { emailAddress, historyId } = JSON.parse(rawData);
-//       const email = emailAddress.toLowerCase();
-
-//       const account = await this.prisma.gmailAccount.findUnique({ where: { email } });
-//       if (!account || !account.lastHistoryId) return;
-
-//       this.oauth2Client.setCredentials({
-//         refresh_token: account.refreshToken,
-//       });
-
-//       const gmail = google.gmail({ version: 'v1', auth: this.oauth2Client });
-
-//       const oneDayFromNow = new Date(Date.now() + 24 * 60 * 60 * 1000);
-//       if (!account.watchExpiration || account.watchExpiration < oneDayFromNow) {
-//         this.logger.log(`Watch expiration approaching for ${email}. Renewing watch subscription hiddenly...`);
-        
-//         const watchResult = await gmail.users.watch({
-//           userId: 'me',
-//           requestBody: { topicName: process.env.GOOGLE_PUBSUB_TOPIC },
-//         });
-        
-//         await this.prisma.gmailAccount.update({
-//           where: { email },
-//           data: { watchExpiration: new Date(Number(watchResult.data.expiration)) },
-//         });
-//       }
-      
-//       const historyResponse = await gmail.users.history.list({
-//         userId: 'me',
-//         startHistoryId: account.lastHistoryId,
-//       });
-
-//       if (historyResponse.data.history) {
-//         for (const record of historyResponse.data.history) {
-//           if (record.messages) {
-//             for (const msg of record.messages) {
-//               if (msg.id) {
-//                 await this.processMessage(gmail, msg.id);
-//               }
-//             }
-//           }
-//         }
-//       }
-
-//       await this.prisma.gmailAccount.update({
-//         where: { email },
-//         data: { lastHistoryId: String(historyId) },
-//       });
-
-//     } catch (error) {
-//       this.logger.error('Failed to process incoming webhook sync:', error);
-//     }
-//   }
-
-//   private async processMessage(gmail: any, messageId: string): Promise<void> {
-//     try {
-//       const message = await gmail.users.messages.get({ userId: 'me', id: messageId });
-//       const sourceId = this.extractExternalId(message.data); 
-//       if (!sourceId) return;
-
-//       const isNew = await this.redisService.setNxEx(`sync:msg:${sourceId}`, 'processing', 3600);
-//       if (!isNew) {
-//         this.logger.warn(`Duplicate conflict flagged for ID: ${sourceId}. Dropping task.`);
-//         return; 
-//       } 
-
-//       const rawRecord = await this.prisma.rawData.create({
-//         data: {
-//           sourceId,
-//           payload: message.data as any, 
-//           status: 'PENDING',
-//         },
-//       });
-
-//       try {
-//         const parsedEmailContent = this.parseEmailBody(message.data);
-        
-//         console.log('--- Parsed Unique Mail Content ---');
-//         console.log(`Source Platform ID: ${sourceId}`);
-//         console.log('Content Details:', parsedEmailContent);
-//         console.log('---------------------------------');
-
-//         await this.prisma.rawData.update({
-//           where: { id: rawRecord.id },
-//           data: { status: 'PROCESSED' },
-//         });
-//       } catch (err) {
-//         await this.prisma.rawData.update({
-//           where: { id: rawRecord.id },
-//           data: { status: 'FAILED' },
-//         });
-//       }
-//     } catch (error) {
-//       this.logger.error(`Error processing message ${messageId}:`, error);
-//     }
-//   }
-
-//   private extractExternalId(messageData: any): string | null {
-//     return messageData.id || null; 
-//   }
-
-//   private parseEmailBody(messageData: any) {
-//     return {
-//       snippet: messageData.snippet,
-//       internalDate: messageData.internalDate,
-//     };
-//   }
-// }

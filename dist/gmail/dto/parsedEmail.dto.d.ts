@@ -1,6 +1,5 @@
-import { BookingData } from "./booking-data.dto";
-export type EmailProvider = 'tripadvisor' | 'website' | 'unknown';
 export declare class ParsedEmailDto {
+    provider: string;
     subject: string | null;
     from: string | null;
     to: string | null;
@@ -11,7 +10,5 @@ export declare class ParsedEmailDto {
     textBody: string | null;
     htmlBody: string | null;
     cleanBody: string | null;
-    provider: EmailProvider;
-    bookingData: BookingData | null;
-    rawFallback: string | null;
+    bookingData: Record<string, any> | null;
 }

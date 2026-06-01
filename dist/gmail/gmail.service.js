@@ -48,6 +48,8 @@ const common_1 = require("@nestjs/common");
 const googleapis_1 = require("googleapis");
 const prisma_service_1 = require("../prisma/prisma.service");
 const cheerio = __importStar(require("cheerio"));
+const tripadvisorHtmlParser_1 = require("./parsers/tripadvisorHtmlParser");
+const websiteHtmlParser_1 = require("./parsers/websiteHtmlParser");
 let GmailService = GmailService_1 = class GmailService {
     prisma;
     logger = new common_1.Logger(GmailService_1.name);
@@ -168,18 +170,7 @@ let GmailService = GmailService_1 = class GmailService {
         try {
             const message = await gmail.users.messages.get({ userId: 'me', id: messageId });
             const parsed = this.parseEmailBody(message.data);
-            console.log('--- Parsed Email ---');
-            console.log('Provider    :', parsed.provider);
-            console.log('Subject     :', parsed.subject);
-            console.log('From        :', parsed.from);
-            console.log('Date        :', parsed.date);
-            console.log('Snippet     :', parsed.snippet);
-            console.log('Clean body preview:\n', parsed.cleanBody?.slice(0, 500));
-            console.log('--------------------');
-            console.log('Full raw message data:', message.data);
-            console.log('html', parsed.htmlBody);
-            console.log('--------------------');
-            console.log('all in one and unparsed', message.data);
+            console.log('--- Parsed Email ---', parsed);
         }
         catch (error) {
             this.logger.error(`Error processing message ${messageId}:`, error);
@@ -214,11 +205,23 @@ let GmailService = GmailService_1 = class GmailService {
             headers['sender'] ?? '',
             headers['return-path'] ?? '',
         ].join(' ').toLowerCase();
-        if (senderFields.includes('tripadvisor.com'))
+        if (senderFields.includes('nquocnhu95tourguide@gmail.com'))
             return 'tripadvisor';
         if (senderFields.includes('yourdomain.com'))
             return 'website';
         return 'unknown';
+    }
+    parseBookingData(provider, htmlBody) {
+        if (!htmlBody)
+            return null;
+        switch (provider) {
+            case 'tripadvisor':
+                return tripadvisorHtmlParser_1.TripAdvisorHtmlParser.parse(htmlBody);
+            case 'website':
+                return websiteHtmlParser_1.WebsiteHtmlParser.parse(htmlBody);
+            default:
+                return null;
+        }
     }
     parseEmailBody(messageData) {
         const allParts = this.extractParts(messageData.payload);
@@ -232,6 +235,7 @@ let GmailService = GmailService_1 = class GmailService {
             headers[h.name.toLowerCase()] = h.value;
         }
         const provider = this.detectProvider(headers);
+        const bookingData = this.parseBookingData(provider, htmlBody);
         return {
             subject: headers['subject'] ?? null,
             from: headers['from'] ?? null,
@@ -244,8 +248,7 @@ let GmailService = GmailService_1 = class GmailService {
             htmlBody,
             cleanBody,
             provider,
-            bookingData: null,
-            rawFallback: cleanBody,
+            bookingData,
         };
     }
 };

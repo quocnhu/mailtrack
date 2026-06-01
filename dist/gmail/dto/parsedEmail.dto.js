@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParsedEmailDto = void 0;
 class ParsedEmailDto {
+    provider;
     subject;
     from;
     to;
@@ -12,9 +13,7 @@ class ParsedEmailDto {
     textBody;
     htmlBody;
     cleanBody;
-    provider;
     bookingData;
-    rawFallback;
 }
 exports.ParsedEmailDto = ParsedEmailDto;
-//# sourceMappingURL=parsed-email.dto.js.map
+//# sourceMappingURL=parsedEmail.dto.js.map

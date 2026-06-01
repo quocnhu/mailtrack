@@ -1,8 +1,5 @@
-import { BookingData } from '@/gmail/dto/booking-data.dto';
-
-export type EmailProvider = 'tripadvisor' | 'website' | 'unknown';
-
 export class ParsedEmailDto {
+  provider:     string;
   subject:      string | null;
   from:         string | null;
   to:           string | null;
@@ -13,7 +10,5 @@ export class ParsedEmailDto {
   textBody:     string | null;
   htmlBody:     string | null;
   cleanBody:    string | null;
-  provider:     EmailProvider;
-  bookingData:  BookingData | null;  // null if extraction failed or unknown provider
-  rawFallback:  string | null;       // cleanBody used when template extraction fails
+  bookingData:  Record<string, any> | null;
 }

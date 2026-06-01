@@ -1,14 +1,14 @@
 import * as cheerio from 'cheerio';
-import { TripAdvisorBookingDto } from '@/gmail/dto/tripadvisor-booking.dto';
+import { TripadvisorBookingDto } from '@/gmail/dto/tripadvisor-booking.dto';
 
 export class TripAdvisorHtmlParser {
   /**
    * Cleans, trims, and parses messy TripAdvisor/Bókun HTML payloads into a structured JSON DTO
    */
-  public static parse(htmlBody: string): TripAdvisorBookingDto {
+  public static parse(htmlBody: string): TripadvisorBookingDto {
     const $ = cheerio.load(htmlBody);
     const result: Record<string, string> = {
-      templateProvider: 'tripadvisor_bokun'
+      templateProvider: 'tripadvisor'
     };
 
     const mappingRules: Record<string, string> = {
@@ -56,24 +56,28 @@ export class TripAdvisorHtmlParser {
     }
 
     return {
-      bookingRef: result.bookingRef || '',
-      productBookingRef: result.productBookingRef || '',
-      extBookingRef: result.extBookingRef || '',
-      product: result.product || '',
-      supplier: result.supplier || '',
-      soldBy: result.soldBy || '',
-      bookingChannel: result.bookingChannel || '',
-      customerName: result.customerName || '',
-      customerEmail: result.customerEmail || '',
-      customerPhone: result.customerPhone || '',
-      date: result.date || '',
-      rate: result.rate || '',
-      pax: result.pax || '',
-      pickup: result.pickup || '',
-      guidedLanguages: result.guidedLanguages || '',
-      created: result.created || '',
-      viatorAmount: result.viatorAmount || 'N/A',
-      templateProvider: result.templateProvider
+      provider: result.templateProvider,// "tripadvisor" not included in the orginal html
+      bookingRef: result.bookingRef || null, //
+      productBookingRef: result.productBookingRef || null,
+      extBookingRef: result.extBookingRef || null,
+      tourName: result.product || null, //
+      supplier: result.supplier || null,
+      soldBy: result.soldBy || null,
+      bookingChannel: result.bookingChannel || null,
+      customer: result.customerName || null,
+      customerEmail: result.customerEmail || null,
+      customerPhone: result.customerPhone || null,
+      date: result.date || null,
+      rate: result.rate || null,
+      pax: result.pax || null,
+      pickUp: result.pickup || null,
+      guidedLanguages: result.guidedLanguages || null,
+      extras: null,
+      inclusions: null,
+      bookingLanguages: null,
+      cost: result.viatorAmount || null,
+      createdAt: result.created || null,
+
     };
   }
 }

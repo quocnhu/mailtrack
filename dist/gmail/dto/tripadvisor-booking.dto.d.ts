@@ -1,8 +1,9 @@
-export interface BookingData {
+export declare class TripadvisorBookingDto {
+    provider: string;
     bookingRef: string | null;
     productBookingRef: string | null;
     extBookingRef: string | null;
-    product: string | null;
+    tourName: string | null;
     supplier: string | null;
     soldBy: string | null;
     bookingChannel: string | null;
@@ -14,6 +15,9 @@ export interface BookingData {
     pax: string | null;
     pickUp: string | null;
     guidedLanguages: string | null;
-    notes: string | null;
+    extras: string | null;
+    inclusions: string | null;
+    bookingLanguages: string | null;
+    cost: string | null;
     createdAt: string | null;
 }

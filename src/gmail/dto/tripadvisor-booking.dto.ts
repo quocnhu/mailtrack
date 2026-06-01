@@ -1,22 +1,37 @@
-// src/gmail/dto/tripadvisor-booking.dto.ts
+export class TripadvisorBookingDto {
+  provider: string; // "tripadvisor"
+  // ── Booking identifiers ───────────────────────────────────────────────
+  bookingRef:        string | null;  // "VIA-91235617"
+  productBookingRef: string | null;  // "Hana-T130151029"
+  extBookingRef:     string | null;  // "1394584387"
 
-export interface TripAdvisorBookingDto {
-  bookingRef: string | null;
-  productBookingRef: string | null;
-  extBookingRef: string | null;
-  product: string | null;
-  supplier: string | null;
-  soldBy: string | null;
-  bookingChannel: string | null;
-  customerName: string | null;
-  customerEmail: string | null;
-  customerPhone: string | null;
-  date: string | null;
-  rate: string | null;
-  pax: string | null;
-  pickup: string | null;
-  guidedLanguages: string | null;
-  created: string | null;
-  viatorAmount: string | null;
-  templateProvider: string;
+  // ── Product ───────────────────────────────────────────────────────────
+  tourName:          string | null;  // "107622P40 - Cu Chi-Ben Duoc Tunnels..."
+  supplier:          string | null;  // "HANA TOURIST"
+  soldBy:            string | null;  // "Viator.com"
+  bookingChannel:    string | null;  // "Viator.com"
+
+  // ── Customer ──────────────────────────────────────────────────────────
+  customer:          string | null;  // "MUNRO, Rowland"
+  customerEmail:     string | null;  // "S-9d0cc5b...@expmessaging.tripadvisor.com"
+  customerPhone:     string | null;  // "+61409082488"
+
+  // ── Booking details ───────────────────────────────────────────────────
+  date:              string | null;  // "Mon 8.Jun '26 @ 07:30"
+  rate:              string | null;  // "Shared Group Of 10 Max"
+  pax:               string | null;  // "2 Adult"
+  pickUp:            string | null;  // "Liberty Central Saigon Riverside Hotel"
+  guidedLanguages:   string | null;  // "(Guided language: English)"
+  extras:            string | null;  // empty in this booking
+
+  // ── Notes ─────────────────────────────────────────────────────────────
+  inclusions:        string | null;  // "Hotel pickup & drop-off, van, guide..."
+  bookingLanguages:  string | null;  // "GUIDE : English"
+
+  // ── Cost ──────────────────────────────────────────────────────────────
+  // Not a standalone row — buried inside notes as "Viator amount: USD 39.96"
+  cost:              string | null;  // "USD 39.96"
+
+  // ── Meta ──────────────────────────────────────────────────────────────
+  createdAt:         string | null;  // "Fri, May 08 2026 @ 01:25"
 }

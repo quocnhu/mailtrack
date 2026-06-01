@@ -23,5 +23,6 @@ export declare class GmailService implements OnApplicationBootstrap {
     private extractParts;
     private stripHtml;
     private detectProvider;
+    private parseBookingData;
     private parseEmailBody;
 }
