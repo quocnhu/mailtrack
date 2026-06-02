@@ -14,10 +14,13 @@ export declare class TripadvisorBookingDto {
     rate: string | null;
     pax: string | null;
     pickUp: string | null;
+    pickUpAddress: string | null;
     guidedLanguages: string | null;
     extras: string | null;
     inclusions: string | null;
     bookingLanguages: string | null;
-    cost: string | null;
+    totalcost: string | null;
+    paxTotal: number | null;
+    tourType: string | null;
     createdAt: string | null;
 }

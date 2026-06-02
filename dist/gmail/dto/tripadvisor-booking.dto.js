@@ -17,11 +17,14 @@ class TripadvisorBookingDto {
     rate;
     pax;
     pickUp;
+    pickUpAddress;
     guidedLanguages;
     extras;
     inclusions;
     bookingLanguages;
-    cost;
+    totalcost;
+    paxTotal;
+    tourType;
     createdAt;
 }
 exports.TripadvisorBookingDto = TripadvisorBookingDto;

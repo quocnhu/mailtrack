@@ -2,9 +2,11 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { google } from 'googleapis';
 import { PrismaService } from '@/prisma/prisma.service';
 import * as cheerio from 'cheerio';
-import { ParsedEmailDto} from '@/gmail/dto/parsedEmail.dto';
+import { ParsedEmailDto } from '@/gmail/dto/parsedEmail.dto';
 import { TripAdvisorHtmlParser } from '@/gmail/parsers/tripadvisorHtmlParser';
 import { WebsiteHtmlParser } from '@/gmail/parsers/websiteHtmlParser';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class GmailService implements OnApplicationBootstrap {
@@ -150,8 +152,15 @@ export class GmailService implements OnApplicationBootstrap {
       const message = await gmail.users.messages.get({ userId: 'me', id: messageId });
       const parsed: ParsedEmailDto = this.parseEmailBody(message.data);
 
-      console.log('--- Parsed Email ---', parsed);
+      console.log('html length:', parsed.htmlBody?.length);
 
+      fs.writeFileSync(
+        path.join(__dirname, `tripadvisor-${Date.now()}.html`),
+        parsed.htmlBody ?? '',
+        'utf8',
+      );
+      //The main output
+      console.log('--- Parsed Email ---', parsed);
       // console.log('--- Parsed Email ---');
       // console.log('Provider    :', parsed.provider);
       // console.log('Subject     :', parsed.subject);
@@ -201,14 +210,14 @@ export class GmailService implements OnApplicationBootstrap {
 
   private detectProvider(headers: Record<string, string>): 'tripadvisor' | 'website' | 'unknown' {
     const senderFields = [
-      headers['from']        ?? '',
-      headers['reply-to']    ?? '',
-      headers['sender']      ?? '',
+      headers['from'] ?? '',
+      headers['reply-to'] ?? '',
+      headers['sender'] ?? '',
       headers['return-path'] ?? '',
     ].join(' ').toLowerCase();
 
     if (senderFields.includes('nquocnhu95tourguide@gmail.com')) return 'tripadvisor';
-    if (senderFields.includes('yourdomain.com')) return 'website';
+    if (senderFields.includes('nquocnhu95book@gmail.com')) return 'website';
 
     return 'unknown';
   }
@@ -231,41 +240,49 @@ export class GmailService implements OnApplicationBootstrap {
 
   private parseEmailBody(messageData: any): ParsedEmailDto {
     // ── Stage 1: Decode & Extract MIME Parts ──────────────────────────
-    const allParts  = this.extractParts(messageData.payload);
+    const allParts = this.extractParts(messageData.payload);
     const plainPart = allParts.find((p) => p.mimeType === 'text/plain');
-    const htmlPart  = allParts.find((p) => p.mimeType === 'text/html');
+    const htmlPart = allParts.find((p) => p.mimeType === 'text/html');
 
     const textBody = plainPart ? this.decodeBase64Url(plainPart.data) : null;
-    const htmlBody = htmlPart  ? this.decodeBase64Url(htmlPart.data)  : null;
+    const htmlBody = htmlPart ? this.decodeBase64Url(htmlPart.data) : null;
 
-    // Prefer plain text; fall back to cheerio-stripped HTML
     const cleanBody = textBody ?? (htmlBody ? this.stripHtml(htmlBody) : null);
 
-    // ── Stage 2: Structure Headers ─────────────────────────────────────
+    // ── Stage 2: Structure Headers & Detect Status ─────────────────────
     const headers: Record<string, string> = {};
     for (const h of messageData.payload?.headers ?? []) {
       headers[h.name.toLowerCase()] = h.value;
     }
 
+    const subject = headers['subject'] ?? '';
+    const lowerSubject = subject.toLowerCase();
+    
+    // ✅ Kept right here with the headers for a cleaner, unified flow
+    const status = lowerSubject.includes('cancel') || lowerSubject.includes('cancellation') || lowerSubject.includes('cancelled')
+      ? 'CANCEL'
+      : 'NEW_BOOKING';
+
     // ── Stage 3: Provider Detection ────────────────────────────────────
     const provider = this.detectProvider(headers);
 
-    // ── Stage 4: Deep Structure Scraping (NEW) ──────────────────────────
+    // ── Stage 4: Deep Structure Scraping ────────────────────────────────
     const bookingData = this.parseBookingData(provider, htmlBody);
 
     return {
-      subject:      headers['subject']       ?? null,
-      from:         headers['from']          ?? null,
-      to:           headers['to']            ?? null,
-      date:         headers['date']          ?? null,
-      messageId:    headers['message-id']    ?? null,
-      snippet:      messageData.snippet      ?? null,
+      bookingStatus: status,
+      subject: headers['subject'] ?? null,
+      from: headers['from'] ?? null,
+      to: headers['to'] ?? null,
+      date: headers['date'] ?? null,
+      messageId: headers['message-id'] ?? null,
+      snippet: messageData.snippet ?? null,
       internalDate: messageData.internalDate ?? null,
       textBody,
       htmlBody,
       cleanBody,
       provider,
-      bookingData, // ✅ Extracted structured data automatically populates here!
+      bookingData, 
     };
-  }
+}
 }

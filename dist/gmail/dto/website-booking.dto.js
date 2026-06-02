@@ -10,7 +10,10 @@ class WebsiteBookingDto {
     priceLines;
     subtotal;
     discount;
-    total;
+    totalcost;
+    tourType;
+    pickUp;
+    pickUpAddress;
     billingName;
     billingEmail;
     billingAddress;

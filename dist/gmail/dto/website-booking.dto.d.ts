@@ -7,7 +7,10 @@ export declare class WebsiteBookingDto {
     priceLines: string | null;
     subtotal: number | null;
     discount: number | null;
-    total: number | null;
+    totalcost: number | null;
+    tourType: string | null;
+    pickUp: string | null;
+    pickUpAddress: string | null;
     billingName: string | null;
     billingEmail: string | null;
     billingAddress: string | null;

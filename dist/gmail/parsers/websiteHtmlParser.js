@@ -37,8 +37,35 @@ exports.WebsiteHtmlParser = void 0;
 const cheerio = __importStar(require("cheerio"));
 class WebsiteHtmlParser {
     static parse(htmlBody) {
+        if (!htmlBody) {
+            return {
+                provider: 'website',
+                tourName: null,
+                packageName: null,
+                tourType: 'Shared',
+                tripDate: null,
+                travellers: null,
+                priceLines: null,
+                subtotal: null,
+                discount: null,
+                totalcost: null,
+                billingName: null,
+                billingEmail: null,
+                billingAddress: null,
+                pickUp: null,
+                pickUpAddress: null,
+                billingCity: null,
+                billingCountry: null,
+                bookingLink: null,
+            };
+        }
         const $ = cheerio.load(htmlBody);
-        const parseDollar = (raw) => parseFloat(raw.replace(/[^0-9.]/g, '')) || 0;
+        const parseDollar = (raw) => {
+            if (!raw)
+                return null;
+            const parsed = parseFloat(raw.replace(/[^0-9.]/g, ''));
+            return isNaN(parsed) ? null : parsed;
+        };
         let tourName = null;
         let packageName = null;
         let tripDate = null;
@@ -46,7 +73,8 @@ class WebsiteHtmlParser {
         let subtotal = null;
         let discount = null;
         let total = null;
-        tourName = $('td b').first().text().trim() || null;
+        const tourNameElement = $('td b').first();
+        tourName = tourNameElement.length > 0 ? tourNameElement.text().trim() : null;
         const priceLinesParts = [];
         $('tr').each((_, row) => {
             const cells = $(row).find('td');
@@ -59,7 +87,7 @@ class WebsiteHtmlParser {
             if (key === 'Trip Date')
                 tripDate = val || null;
             if (key === 'Travellers')
-                travellers = parseInt(val) || null;
+                travellers = parseInt(val, 10) || null;
             if (key === 'Subtotal' && val.startsWith('$'))
                 subtotal = parseDollar(val);
             if (key === 'Discount')
@@ -87,7 +115,7 @@ class WebsiteHtmlParser {
             if (key === 'Name')
                 billingName = val || null;
             if (key === 'Email')
-                billingEmail = cells.eq(1).find('a').attr('href')?.replace('mailto:', '') ?? val ?? null;
+                billingEmail = cells.eq(1).find('a').attr('href')?.replace('mailto:', '').trim() ?? val ?? null;
             if (key === 'Billing Address')
                 billingAddress = val || null;
             if (key === 'City')
@@ -98,25 +126,61 @@ class WebsiteHtmlParser {
         $('a').each((_, el) => {
             const href = $(el).attr('href') ?? '';
             if (href.includes('wp-admin') && href.includes('action=edit')) {
-                bookingLink = href;
+                bookingLink = href || null;
             }
         });
+        let tourType = 'UNKNOWN';
+        const combinedContent = `
+      ${(packageName || '').toLowerCase()} 
+      ${(tourName || '').toLowerCase()}
+    `.replace(/\s+/g, ' ');
+        if (combinedContent.includes('private') || combinedContent.includes('solo')) {
+            tourType = 'PRIVATE TOUR';
+        }
+        else if (combinedContent.includes('shared') ||
+            combinedContent.includes('group') ||
+            combinedContent.includes('max ')) {
+            tourType = 'GROUP TOUR';
+        }
+        let pickUpLocation = null;
+        let pickUpAddress = null;
+        const forcedAddress = billingAddress;
+        if (forcedAddress && forcedAddress.trim() !== '') {
+            const cleanAddress = forcedAddress.replace(/\s+/g, ' ').trim();
+            const hotelPattern = /^([^,]+?\b(?:Residence|Hotel|Apartment|Apartments|Suite|Suites|Villa|Villas|Stay|Hostel|Homestay|Spa)\b)(?:,\s*)(.*)$/i;
+            const match = cleanAddress.match(hotelPattern);
+            if (match) {
+                pickUpLocation = match[1].trim() || null;
+                pickUpAddress = match[2].trim() || null;
+            }
+            else if (cleanAddress.includes(',')) {
+                const commaIndex = cleanAddress.indexOf(',');
+                pickUpLocation = cleanAddress.substring(0, commaIndex).trim() || null;
+                pickUpAddress = cleanAddress.substring(commaIndex + 1).trim() || null;
+            }
+            else {
+                pickUpLocation = cleanAddress || null;
+            }
+        }
         return {
             provider: 'website',
-            tourName,
-            packageName,
-            tripDate,
-            travellers,
-            priceLines,
-            subtotal,
-            discount,
-            total,
-            billingName,
-            billingEmail,
-            billingAddress,
-            billingCity,
-            billingCountry,
-            bookingLink,
+            tourName: tourName || null,
+            packageName: packageName || null,
+            tourType: tourType || null,
+            tripDate: tripDate || null,
+            travellers: travellers ?? null,
+            priceLines: priceLines || null,
+            subtotal: subtotal ?? null,
+            discount: discount ?? null,
+            totalcost: total ?? null,
+            billingName: billingName || null,
+            billingEmail: billingEmail || null,
+            billingAddress: billingAddress || null,
+            pickUp: pickUpLocation || null,
+            pickUpAddress: pickUpAddress || null,
+            billingCity: billingCity || null,
+            billingCountry: billingCountry || null,
+            bookingLink: bookingLink || null,
         };
     }
 }

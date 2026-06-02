@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParsedEmailDto = void 0;
 class ParsedEmailDto {
+    bookingStatus;
     provider;
     subject;
     from;

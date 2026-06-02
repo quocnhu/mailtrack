@@ -38,67 +38,146 @@ const cheerio = __importStar(require("cheerio"));
 class TripAdvisorHtmlParser {
     static parse(htmlBody) {
         const $ = cheerio.load(htmlBody);
-        const result = {
-            templateProvider: 'tripadvisor'
-        };
+        const extractedData = {};
         const mappingRules = {
-            'Booking ref.': 'bookingRef',
-            'Product booking ref.': 'productBookingRef',
-            'Ext. booking ref': 'extBookingRef',
-            'Product': 'product',
-            'Supplier': 'supplier',
-            'Sold by': 'soldBy',
-            'Booking channel': 'bookingChannel',
-            'Customer': 'customerName',
-            'Customer email': 'customerEmail',
-            'Customer phone': 'customerPhone',
-            'Date': 'date',
-            'Rate': 'rate',
-            'PAX': 'pax',
-            'Pick-up': 'pickup',
-            'Guided languages': 'guidedLanguages',
-            'Created': 'created',
-            'Notes': 'notes'
+            'booking ref.': 'bookingRef',
+            'product booking ref.': 'productBookingRef',
+            'ext. booking ref': 'extBookingRef',
+            'product': 'product',
+            'supplier': 'supplier',
+            'sold by': 'soldBy',
+            'booking channel': 'bookingChannel',
+            'customer': 'customerName',
+            'customer email': 'customerEmail',
+            'customer phone': 'customerPhone',
+            'date': 'date',
+            'rate': 'rate',
+            'pax': 'pax',
+            'pick-up': 'pickup',
+            'guided languages': 'guidedLanguages',
+            'created': 'created',
+            'notes': 'notes',
+            'extras': 'extras'
         };
-        $('table tr').each((_, row) => {
-            const firstCell = $(row).find('td').first();
-            const secondCell = $(row).find('td').last();
-            const rawLabel = firstCell.find('strong').text().trim();
-            const targetKey = mappingRules[rawLabel];
-            if (targetKey) {
-                const hyperLinkText = secondCell.find('a').text().trim();
-                let cleanValue = hyperLinkText || secondCell.text().trim();
-                cleanValue = cleanValue.replace(/\s+/g, ' ').trim();
-                result[targetKey] = cleanValue;
+        $('table tbody tr').each((_, element) => {
+            const cells = $(element).find('td');
+            if (cells.length >= 2) {
+                const firstCell = cells.first();
+                const secondCell = cells.last();
+                const rawLabel = firstCell.text().replace(/[:\n]/g, '').trim().toLowerCase();
+                const targetKey = mappingRules[rawLabel];
+                if (targetKey) {
+                    const hyperLinkText = secondCell.find('a').text().trim();
+                    let cleanValue = '';
+                    if (targetKey === 'notes') {
+                        const lines = [];
+                        secondCell.find('div').each((_, div) => {
+                            const textLine = $(div).text().trim();
+                            if (textLine)
+                                lines.push(textLine);
+                        });
+                        cleanValue = lines.length > 0 ? lines.join('\n') : secondCell.text().trim();
+                    }
+                    else {
+                        cleanValue = secondCell.text().trim();
+                    }
+                    if (targetKey !== 'notes') {
+                        cleanValue = cleanValue.replace(/\s+/g, ' ').trim();
+                    }
+                    extractedData[targetKey] = cleanValue;
+                }
             }
         });
-        if (result.notes) {
-            const finalPriceMatch = result.notes.match(/Viator amount:\s*([A-Za-z0-9.$ ]+)/i);
-            result.viatorAmount = finalPriceMatch ? finalPriceMatch[1].trim() : 'N/A';
-            delete result.notes;
+        let paxTotal = 0;
+        if (extractedData.pax) {
+            const numbersFound = extractedData.pax.match(/(\d+)\s*(?:Adult|Child|Infant)/gi);
+            if (numbersFound) {
+                paxTotal = numbersFound.reduce((sum, match) => {
+                    const digits = match.match(/\d+/);
+                    return sum + (digits ? parseInt(digits[0], 10) : 0);
+                }, 0);
+            }
         }
+        let tourType = 'UNKNOWN';
+        const combinedContent = `
+      ${(extractedData.rate || '').toLowerCase()} 
+      ${(extractedData.product || '').toLowerCase()}
+    `;
+        if (combinedContent.includes('private') || combinedContent.includes('solo')) {
+            tourType = 'PRIVATE TOUR';
+        }
+        else if (combinedContent.includes('shared') ||
+            combinedContent.includes('group') ||
+            combinedContent.includes('max ')) {
+            tourType = 'GROUP TOUR';
+        }
+        let cleanDate = extractedData.date || null;
+        if (cleanDate && cleanDate.includes('@')) {
+            cleanDate = cleanDate.replace(/\s+/g, ' ').trim();
+        }
+        let rawNotes = extractedData.notes || '';
+        let calculatedCost = null;
+        const priceMatch = rawNotes.match(/Viator amount:\s*([A-Za-z0-9.$ ]+)/i);
+        if (priceMatch) {
+            calculatedCost = priceMatch[1].trim();
+        }
+        let inclusions = null;
+        let bookingLanguages = null;
+        if (rawNotes) {
+            const inclusionMatch = rawNotes.match(/---\s*Inclusions:\s*---([\s\S]*?)(?:---\s*Booking languages:\s*---|Viator amount:|$)/i);
+            if (inclusionMatch && inclusionMatch[1]) {
+                inclusions = inclusionMatch[1]
+                    .split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line && !line.startsWith('---'))
+                    .join(', ');
+            }
+            const languageMatch = rawNotes.match(/---\s*Booking languages:\s*---([\s\S]*?)(?:Viator amount:|$)/i);
+            if (languageMatch && languageMatch[1]) {
+                bookingLanguages = languageMatch[1]
+                    .split('\n')
+                    .map(line => line.replace(/GUIDE\s*:/i, '').trim())
+                    .filter(line => line)
+                    .join(', ');
+            }
+        }
+        let pickUpLocation = extractedData.pickup || null;
+        let pickUpAddress = null;
+        if (pickUpLocation && pickUpLocation.includes(',')) {
+            const commaIndex = pickUpLocation.indexOf(',');
+            const isolatedHotel = pickUpLocation.substring(0, commaIndex).trim();
+            const isolatedAddress = pickUpLocation.substring(commaIndex + 1).trim();
+            pickUpLocation = isolatedHotel;
+            pickUpAddress = isolatedAddress;
+        }
+        let cleanExtras = extractedData.extras || null;
+        if (cleanExtras === '')
+            cleanExtras = null;
         return {
-            provider: result.templateProvider,
-            bookingRef: result.bookingRef || null,
-            productBookingRef: result.productBookingRef || null,
-            extBookingRef: result.extBookingRef || null,
-            tourName: result.product || null,
-            supplier: result.supplier || null,
-            soldBy: result.soldBy || null,
-            bookingChannel: result.bookingChannel || null,
-            customer: result.customerName || null,
-            customerEmail: result.customerEmail || null,
-            customerPhone: result.customerPhone || null,
-            date: result.date || null,
-            rate: result.rate || null,
-            pax: result.pax || null,
-            pickUp: result.pickup || null,
-            guidedLanguages: result.guidedLanguages || null,
-            extras: null,
-            inclusions: null,
-            bookingLanguages: null,
-            cost: result.viatorAmount || null,
-            createdAt: result.created || null,
+            provider: 'tripadvisor',
+            bookingRef: extractedData.bookingRef || null,
+            productBookingRef: extractedData.productBookingRef || null,
+            extBookingRef: extractedData.extBookingRef || null,
+            tourName: extractedData.product || null,
+            supplier: extractedData.supplier || null,
+            soldBy: extractedData.soldBy || null,
+            bookingChannel: extractedData.bookingChannel || null,
+            customer: extractedData.customerName || null,
+            customerEmail: extractedData.customerEmail || null,
+            customerPhone: extractedData.customerPhone || null,
+            date: cleanDate,
+            rate: extractedData.rate || null,
+            pax: extractedData.pax || null,
+            paxTotal: paxTotal > 0 ? paxTotal : null,
+            tourType,
+            pickUp: pickUpLocation,
+            pickUpAddress: pickUpAddress,
+            guidedLanguages: extractedData.guidedLanguages || null,
+            extras: cleanExtras,
+            inclusions: inclusions,
+            bookingLanguages: bookingLanguages,
+            totalcost: calculatedCost,
+            createdAt: extractedData.created || null,
         };
     }
 }

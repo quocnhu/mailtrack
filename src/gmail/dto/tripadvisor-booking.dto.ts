@@ -21,6 +21,7 @@ export class TripadvisorBookingDto {
   rate:              string | null;  // "Shared Group Of 10 Max"
   pax:               string | null;  // "2 Adult"
   pickUp:            string | null;  // "Liberty Central Saigon Riverside Hotel"
+  pickUpAddress:     string | null;  // "65 Le Loi, Ben Nghe, District 1..."
   guidedLanguages:   string | null;  // "(Guided language: English)"
   extras:            string | null;  // empty in this booking
 
@@ -30,7 +31,9 @@ export class TripadvisorBookingDto {
 
   // ── Cost ──────────────────────────────────────────────────────────────
   // Not a standalone row — buried inside notes as "Viator amount: USD 39.96"
-  cost:              string | null;  // "USD 39.96"
+  totalcost:         string | null;  // "USD 39.96"
+  paxTotal:          number | null;  // 2 (extracted from "2 Adult" in pax field)
+  tourType:          string | null;  // "Shared" (derived from rate and tourName)
 
   // ── Meta ──────────────────────────────────────────────────────────────
   createdAt:         string | null;  // "Fri, May 08 2026 @ 01:25"

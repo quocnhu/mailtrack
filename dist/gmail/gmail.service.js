@@ -50,6 +50,8 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const cheerio = __importStar(require("cheerio"));
 const tripadvisorHtmlParser_1 = require("./parsers/tripadvisorHtmlParser");
 const websiteHtmlParser_1 = require("./parsers/websiteHtmlParser");
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
 let GmailService = GmailService_1 = class GmailService {
     prisma;
     logger = new common_1.Logger(GmailService_1.name);
@@ -170,6 +172,8 @@ let GmailService = GmailService_1 = class GmailService {
         try {
             const message = await gmail.users.messages.get({ userId: 'me', id: messageId });
             const parsed = this.parseEmailBody(message.data);
+            console.log('html length:', parsed.htmlBody?.length);
+            fs.writeFileSync(path.join(__dirname, `tripadvisor-${Date.now()}.html`), parsed.htmlBody ?? '', 'utf8');
             console.log('--- Parsed Email ---', parsed);
         }
         catch (error) {
@@ -207,7 +211,7 @@ let GmailService = GmailService_1 = class GmailService {
         ].join(' ').toLowerCase();
         if (senderFields.includes('nquocnhu95tourguide@gmail.com'))
             return 'tripadvisor';
-        if (senderFields.includes('yourdomain.com'))
+        if (senderFields.includes('nquocnhu95book@gmail.com'))
             return 'website';
         return 'unknown';
     }
@@ -234,9 +238,15 @@ let GmailService = GmailService_1 = class GmailService {
         for (const h of messageData.payload?.headers ?? []) {
             headers[h.name.toLowerCase()] = h.value;
         }
+        const subject = headers['subject'] ?? '';
+        const lowerSubject = subject.toLowerCase();
+        const status = lowerSubject.includes('cancel') || lowerSubject.includes('cancellation') || lowerSubject.includes('cancelled')
+            ? 'CANCEL'
+            : 'NEW_BOOKING';
         const provider = this.detectProvider(headers);
         const bookingData = this.parseBookingData(provider, htmlBody);
         return {
+            bookingStatus: status,
             subject: headers['subject'] ?? null,
             from: headers['from'] ?? null,
             to: headers['to'] ?? null,

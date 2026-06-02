@@ -10,7 +10,10 @@ export class WebsiteBookingDto {
   priceLines:     string | null;    // "Adult: 2x$25=$50, Child: 2x$20=$40, Infant: 1x$0=$0"
   subtotal:       number | null;    // 90
   discount:       number | null;    // 0
-  total:          number | null;    // 90
+  totalcost:      number | null;    // 90
+  tourType:       string | null;    // "Shared" (derived from packageName)
+  pickUp:         string | null;    // "Sherwood Residence"
+  pickUpAddress:  string | null;    // "127 Pasteur Street, Ben Nghe Ward, District 1, HCM City"
 
   // ── Billing ───────────────────────────────────────────────────────────
   billingName:    string | null;    // "Rikke Nord"

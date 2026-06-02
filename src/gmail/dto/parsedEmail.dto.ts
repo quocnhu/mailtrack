@@ -1,4 +1,5 @@
 export class ParsedEmailDto {
+  bookingStatus: string;
   provider:     string;
   subject:      string | null;
   from:         string | null;
