@@ -5,8 +5,12 @@ import * as cheerio from 'cheerio';
 import { ParsedEmailDto } from '@/gmail/dto/parsedEmail.dto';
 import { TripAdvisorHtmlParser } from '@/gmail/parsers/tripadvisorHtmlParser';
 import { WebsiteHtmlParser } from '@/gmail/parsers/websiteHtmlParser';
+import type { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull'; // Standard NestJS Queue library
+import { RedisService } from '@/redis/redis.service';
 import * as fs from 'fs';
 import * as path from 'path';
+
 
 @Injectable()
 export class GmailService implements OnApplicationBootstrap {
@@ -19,6 +23,12 @@ export class GmailService implements OnApplicationBootstrap {
 
   constructor(
     private readonly prisma: PrismaService,
+    // 🗄️ The Filing Cabinet (Your Key-Value Cache)
+    private readonly redisService: RedisService,
+
+    // 🏗️ The Conveyor Belt (Your Redis Queue)
+    @InjectQueue('booking-processing-queue')
+    private readonly bookingQueue: Queue,
   ) {
     this.oauth2Client.on('tokens', (tokens) => {
       if (tokens.access_token) {
@@ -149,30 +159,50 @@ export class GmailService implements OnApplicationBootstrap {
 
   private async processMessage(gmail: any, messageId: string): Promise<void> {
     try {
+      // 1. Fetch the raw email from Gmail API
       const message = await gmail.users.messages.get({ userId: 'me', id: messageId });
+
+      // 2. Parse the email body to extract booking details
       const parsed: ParsedEmailDto = this.parseEmailBody(message.data);
+      const uniqueRef = parsed.bookingData?.bookingRef;
 
+      // Optional debug stuff you had
       console.log('html length:', parsed.htmlBody?.length);
-
       fs.writeFileSync(
         path.join(__dirname, `tripadvisor-${Date.now()}.html`),
         parsed.htmlBody ?? '',
         'utf8',
       );
-      //The main output
       console.log('--- Parsed Email ---', parsed);
-      // console.log('--- Parsed Email ---');
-      // console.log('Provider    :', parsed.provider);
-      // console.log('Subject     :', parsed.subject);
-      // console.log('From        :', parsed.from);
-      // console.log('Date        :', parsed.date);
-      // console.log('Snippet     :', parsed.snippet);
-      // console.log('Clean body preview:\n', parsed.cleanBody?.slice(0, 500));
-      // console.log('--------------------');
-      // console.log('Full raw message data:', message.data);
-      // console.log('html', parsed.htmlBody);
-      // console.log('--------------------');
-      // console.log('all in one and unparsed', message.data);
+
+      // If there's no booking reference, we can't track duplicates or queue it safely
+      if (!uniqueRef) {
+        this.logger.warn(`Skipping message ${messageId}: No unique booking reference found.`);
+        return;
+      }
+
+      // ─── REDIS SERVICE: FILING CABINET ──────────────────────────────────
+      // 3. Create the meaningful, semantic key name
+      const bookingCacheKey = this.redisService.getBookingKey(parsed.provider, uniqueRef);
+
+      // 4. KEY-VALUE MECHANISM: Check if this email was already handled
+      const existingCache = await this.redisService.get(bookingCacheKey);
+      if (parsed.bookingStatus === 'NEW_BOOKING' && existingCache) {
+        this.logger.log(`[DEDUPLICATED] Dropping duplicate email for key: ${bookingCacheKey}`);
+        return; // Stop right here, drop the duplicate!
+      }
+
+      // 5. KEY-VALUE MECHANISM: Save it to RAM cache for 24 hours to lock it
+      await this.redisService.cacheParsedMail(bookingCacheKey, parsed);
+
+      // ─── BULL QUEUE: CONVEYOR BELT ──────────────────────────────────────
+      // 6. QUEUE MECHANISM: Push the payload onto the belt for Postgres processing
+      await this.bookingQueue.add('process-email-job', {
+        bookingKey: bookingCacheKey, // Tell the worker what the cache key name is
+        payload: parsed             // Send the fully parsed TripAdvisor email structure
+      });
+
+      this.logger.log(`[SUCCESS] Message ${messageId} successfully cached and queued.`);
     } catch (error) {
       this.logger.error(`Error processing message ${messageId}:`, error);
     }
@@ -257,7 +287,7 @@ export class GmailService implements OnApplicationBootstrap {
 
     const subject = headers['subject'] ?? '';
     const lowerSubject = subject.toLowerCase();
-    
+
     // ✅ Kept right here with the headers for a cleaner, unified flow
     const status = lowerSubject.includes('cancel') || lowerSubject.includes('cancellation') || lowerSubject.includes('cancelled')
       ? 'CANCEL'
@@ -282,7 +312,7 @@ export class GmailService implements OnApplicationBootstrap {
       htmlBody,
       cleanBody,
       provider,
-      bookingData, 
+      bookingData,
     };
-}
+  }
 }
