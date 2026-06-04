@@ -12,6 +12,8 @@ const gmail_controller_1 = require("./gmail.controller");
 const gmail_service_1 = require("./gmail.service");
 const prisma_module_1 = require("../prisma/prisma.module");
 const redis_module_1 = require("../redis/redis.module");
+const bull_1 = require("@nestjs/bull");
+const gmail_consumer_1 = require("./gmail.consumer");
 let GmailModule = class GmailModule {
 };
 exports.GmailModule = GmailModule;
@@ -20,9 +22,12 @@ exports.GmailModule = GmailModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             redis_module_1.RedisModule,
+            bull_1.BullModule.registerQueue({
+                name: 'booking-processing-queue',
+            }),
         ],
         controllers: [gmail_controller_1.GmailController],
-        providers: [gmail_service_1.GmailService],
+        providers: [gmail_service_1.GmailService, gmail_consumer_1.GmailConsumer],
         exports: [gmail_service_1.GmailService],
     })
 ], GmailModule);

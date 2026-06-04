@@ -1,10 +1,14 @@
 import { OnApplicationBootstrap } from '@nestjs/common';
 import { PrismaService } from "../prisma/prisma.service";
+import type { Queue } from 'bull';
+import { RedisService } from "../redis/redis.service";
 export declare class GmailService implements OnApplicationBootstrap {
     private readonly prisma;
+    private readonly redisService;
+    private readonly bookingQueue;
     private readonly logger;
     private oauth2Client;
-    constructor(prisma: PrismaService);
+    constructor(prisma: PrismaService, redisService: RedisService, bookingQueue: Queue);
     onApplicationBootstrap(): Promise<void>;
     getAuthUrl(): Promise<string>;
     handleAuthorizationCode(code: string): Promise<{
@@ -15,7 +19,6 @@ export declare class GmailService implements OnApplicationBootstrap {
         refreshToken: string;
         createdAt: Date;
         updatedAt: Date;
-        userId: string | null;
     }>;
     processWebhookPayload(base64Data: string): Promise<void>;
     private processMessage;

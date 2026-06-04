@@ -1,0 +1,58 @@
+For a personal project or small team, I would use exactly these two commands:
+
+1. Generate Prisma Client
+npx prisma generate
+
+This is 100% safe.
+
+No database changes.
+Just updates TypeScript Prisma Client.
+2. Apply migration
+npx prisma migrate dev --name add_audit_log
+
+This is the recommended Prisma workflow.
+
+Prisma will:
+
+Compare schema with database.
+Generate SQL migration.
+Show warnings if anything destructive exists.
+Execute migration.
+Regenerate Prisma Client.
+Typical workflow
+
+Whenever you change schema.prisma:
+
+npx prisma migrate dev --name meaningful_name
+
+Examples:
+
+npx prisma migrate dev --name add_coordinate_table
+npx prisma migrate dev --name add_audit_log
+npx prisma migrate dev --name add_booking_status
+
+After migration:
+
+npx prisma generate
+
+is usually not even necessary because migrate dev automatically runs generate.
+
+My recommendation
+
+For your current schema:
+
+npx prisma migrate dev --name add_audit_log
+
+That's enough.
+
+You do not need:
+
+npx prisma db push
+
+because migrate dev is safer and keeps migration history.
+
+A good rule:
+
+Development → migrate dev
+Production → migrate deploy
+Avoid db push except for quick experiments.

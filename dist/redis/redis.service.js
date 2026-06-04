@@ -19,14 +19,38 @@ let RedisService = class RedisService {
     constructor(redis) {
         this.redis = redis;
     }
-    async set(key, value) {
-        return this.redis.set(key, value);
+    getBookingKey(provider, bookingRef) {
+        return `parsedmail:booking:${provider.toLowerCase()}:${bookingRef.toLowerCase()}`;
     }
-    async setEx(key, seconds, value) {
-        return this.redis.set(key, value, 'EX', seconds);
+    async cacheParsedMail(key, data, ttlSeconds = 86400) {
+        await this.redis.set(key, JSON.stringify(data), 'EX', ttlSeconds);
     }
-    async setNxEx(key, value, seconds) {
-        return this.redis.set(key, value, 'EX', seconds, 'NX');
+    async pushToRawQueue(data) {
+        const queueKey = 'parsedmail:queue:raw-postgres';
+        return this.redis.rpush(queueKey, JSON.stringify(data));
+    }
+    async popFromRawQueue() {
+        const queueKey = 'parsedmail:queue:raw-postgres';
+        const rawData = await this.redis.lpop(queueKey);
+        if (!rawData)
+            return null;
+        return JSON.parse(rawData);
+    }
+    async getRawQueueLength() {
+        const queueKey = 'parsedmail:queue:raw-postgres';
+        return this.redis.llen(queueKey);
+    }
+    getGeoCacheKey(sanitizedAddress) {
+        return `geo:cache:${sanitizedAddress.trim().toLowerCase()}`;
+    }
+    async cacheCoordinates(key, coordinates, ttlSeconds = 2592000) {
+        await this.redis.set(key, JSON.stringify(coordinates), 'EX', ttlSeconds);
+    }
+    async incr(key) {
+        return this.redis.incr(key);
+    }
+    async set(key, value, ttlSeconds) {
+        await this.redis.set(key, value, 'EX', ttlSeconds);
     }
     async get(key) {
         return this.redis.get(key);

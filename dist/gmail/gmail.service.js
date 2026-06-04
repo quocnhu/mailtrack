@@ -41,6 +41,9 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var GmailService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GmailService = void 0;
@@ -50,14 +53,20 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const cheerio = __importStar(require("cheerio"));
 const tripadvisorHtmlParser_1 = require("./parsers/tripadvisorHtmlParser");
 const websiteHtmlParser_1 = require("./parsers/websiteHtmlParser");
+const bull_1 = require("@nestjs/bull");
+const redis_service_1 = require("../redis/redis.service");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 let GmailService = GmailService_1 = class GmailService {
     prisma;
+    redisService;
+    bookingQueue;
     logger = new common_1.Logger(GmailService_1.name);
     oauth2Client = new googleapis_1.google.auth.OAuth2(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET, process.env.GOOGLE_REDIRECT_URI);
-    constructor(prisma) {
+    constructor(prisma, redisService, bookingQueue) {
         this.prisma = prisma;
+        this.redisService = redisService;
+        this.bookingQueue = bookingQueue;
         this.oauth2Client.on('tokens', (tokens) => {
             if (tokens.access_token) {
                 this.logger.log('Access token rotated hiddenly by Google SDK.');
@@ -172,9 +181,26 @@ let GmailService = GmailService_1 = class GmailService {
         try {
             const message = await gmail.users.messages.get({ userId: 'me', id: messageId });
             const parsed = this.parseEmailBody(message.data);
+            const uniqueRef = parsed.bookingData?.bookingRef;
             console.log('html length:', parsed.htmlBody?.length);
             fs.writeFileSync(path.join(__dirname, `tripadvisor-${Date.now()}.html`), parsed.htmlBody ?? '', 'utf8');
             console.log('--- Parsed Email ---', parsed);
+            if (!uniqueRef) {
+                this.logger.warn(`Skipping message ${messageId}: No unique booking reference found.`);
+                return;
+            }
+            const bookingCacheKey = this.redisService.getBookingKey(parsed.provider, uniqueRef);
+            const existingCache = await this.redisService.get(bookingCacheKey);
+            if (parsed.bookingStatus === 'NEW_BOOKING' && existingCache) {
+                this.logger.log(`[DEDUPLICATED] Dropping duplicate email for key: ${bookingCacheKey}`);
+                return;
+            }
+            await this.redisService.cacheParsedMail(bookingCacheKey, parsed);
+            await this.bookingQueue.add('process-email-job', {
+                bookingKey: bookingCacheKey,
+                payload: parsed
+            });
+            this.logger.log(`[SUCCESS] Message ${messageId} successfully cached and queued.`);
         }
         catch (error) {
             this.logger.error(`Error processing message ${messageId}:`, error);
@@ -265,6 +291,8 @@ let GmailService = GmailService_1 = class GmailService {
 exports.GmailService = GmailService;
 exports.GmailService = GmailService = GmailService_1 = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(2, (0, bull_1.InjectQueue)('booking-processing-queue')),
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        redis_service_1.RedisService, Object])
 ], GmailService);
 //# sourceMappingURL=gmail.service.js.map

@@ -50,12 +50,17 @@ model RawData {
 
 // ─── COORDINATE CACHE ────────────────────────────────────────────────
 model Coordinate {
-  id        String   @id @default(uuid())
-  address   String   @unique
-  hotelName String?
-  latitude  Float
-  longitude Float
-  createdAt DateTime @default(now())
+   id          String   @id @default(uuid())
+   hotelName   String
+   starRating  String?
+   address     String   @unique
+   coordinate String? 
+   latitude    Float
+   longitude   Float
+   createdAt   DateTime @default(now())
+   updatedAt   DateTime @updatedAt
+
+  @@index([latitude, longitude])
 }
 
 // ─── FINAL BOOKING MODEL ─────────────────────────────────────────────
@@ -91,4 +96,23 @@ model Booking {
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+
+  entityType String   // Booking, Coordinate, RawData
+  entityId   String
+
+  action     String   // CREATE, UPDATE, DELETE, ASSIGN
+
+  beforeData Json?
+  afterData  Json?
+
+  changedBy  String?
+
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
 }

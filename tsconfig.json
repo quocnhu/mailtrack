@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["node", "jest"],
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "resolvePackageJsonExports": true,
@@ -34,5 +35,6 @@
     "node_modules",
     "dist",
     "prisma" // Tells TypeScript to completely ignore the prisma folder
-  ]
+  ],
+  "esModuleInterop": true
 }

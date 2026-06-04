@@ -15,6 +15,8 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const redis_module_1 = require("./redis/redis.module");
 const prisma_module_1 = require("./prisma/prisma.module");
+const bull_1 = require("@nestjs/bull");
+const data_module_1 = require("./data/data.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -25,9 +27,13 @@ exports.AppModule = AppModule = __decorate([
                 isGlobal: true,
             }),
             schedule_1.ScheduleModule.forRoot(),
+            bull_1.BullModule.forRoot({
+                url: process.env.REDIS_URL || 'redis://localhost:6379',
+            }),
             gmail_module_1.GmailModule,
             redis_module_1.RedisModule,
             prisma_module_1.PrismaModule,
+            data_module_1.DataModule,
         ],
         providers: [app_service_1.AppService],
         controllers: [app_controller_1.AppController],

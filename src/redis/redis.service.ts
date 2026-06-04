@@ -8,7 +8,7 @@ export class RedisService {
     private readonly redis: RedisType,
   ) {}
 
-  // ─── PLACE 1: BOOKING CACHE (DEDUPLICATION / FILING CABINET) ──────
+  // ─── PLACE 1: BOOKING CACHE (DEDUPLICATION) ────────────────────────
   
   /**
    * Generates the semantic key name for checking duplicate email processes.
@@ -30,7 +30,6 @@ export class RedisService {
   
   /**
    * Pushes the parsed email payload straight onto your Postgres ingestion queue.
-   * Mechanism: Uses native Redis RPUSH to append data onto a List.
    */
   async pushToRawQueue(data: any): Promise<number> {
     const queueKey = 'parsedmail:queue:raw-postgres';
@@ -38,8 +37,7 @@ export class RedisService {
   }
 
   /**
-   * Pulls the oldest pending parsed email off the queue so your worker can insert it into Postgres.
-   * Mechanism: Uses native Redis LPOP to pull data off the List.
+   * Pulls the oldest pending parsed email off the queue.
    */
   async popFromRawQueue(): Promise<any | null> {
     const queueKey = 'parsedmail:queue:raw-postgres';
@@ -55,6 +53,37 @@ export class RedisService {
   async getRawQueueLength(): Promise<number> {
     const queueKey = 'parsedmail:queue:raw-postgres';
     return this.redis.llen(queueKey);
+  }
+
+  // ─── PLACE 3: GEOCODING CACHE & ANTI-SPAM (NEW) ────────────────────
+
+  /**
+   * Generates a unique cache key based on a sanitized address string.
+   * Example output: geo:cache:123 alley block hanoi
+   */
+  getGeoCacheKey(sanitizedAddress: string): string {
+    return `geo:cache:${sanitizedAddress.trim().toLowerCase()}`;
+  }
+
+  /**
+   * Caches resolved coordinates in Redis RAM with an explicit expiration (defaults to 1 month).
+   */
+  async cacheCoordinates(key: string, coordinates: { lat: number | null; lng: number | null }, ttlSeconds = 2592000): Promise<void> {
+    await this.redis.set(key, JSON.stringify(coordinates), 'EX', ttlSeconds);
+  }
+
+  /**
+   * Atomically increments the rate-limit window tracker key for your anti-spam layer.
+   */
+  async incr(key: string): Promise<number> {
+    return this.redis.incr(key);
+  }
+
+  /**
+   * Sets a key string along with an explicit TTL in seconds.
+   */
+  async set(key: string, value: string, ttlSeconds: number): Promise<void> {
+    await this.redis.set(key, value, 'EX', ttlSeconds);
   }
 
   // ─── REDIS PRIMITIVE UTILITIES ─────────────────────────────────────

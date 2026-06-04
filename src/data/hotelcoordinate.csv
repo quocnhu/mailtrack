@@ -1,0 +1,48 @@
+hotelName,starRating,address,coordinate,latitude,longitude
+Park Hyatt Saigon,5-Star,"2 Lam Son Square, Bến Nghé Ward, District 1","10.777639169459526, 106.70337774413669",10.77763917,106.7033777
+Caravelle Saigon,5-Star,"19-23 Lam Son Square, Bến Nghé Ward, District 1","10.776372964927795, 106.70359243887397",10.77637296,106.7035924
+The Reverie Saigon Hotel,5-Star,"22-36 Nguyen Hue Boulevard, Bến Nghé Ward, District 1","10.773719043009333, 106.7046466919225",10.77371904,106.7046467
+Hotel Majestic Saigon,5-Star,"1 Dong Khoi Street, Bến Nghé Ward, District 1","10.773022267911015, 106.70607100511634",10.77302227,106.706071
+Rex Hotel Saigon,5-Star,"141 Nguyen Hue Boulevard, Bến Nghé Ward, District 1","10.775679482475697, 106.70125106771009",10.77567948,106.7012511
+Sheraton Saigon Grand Opera,5-Star,"88 Dong Khoi Street, Bến Nghé Ward, District 1","10.775497062861001, 106.70388336899461",10.77549706,106.7038834
+Hotel Grand Saigon,5-Star,"8 Dong Khoi Street, Bến Nghé Ward, District 1","10.774234713441915, 106.70534547460785",10.77423471,106.7053455
+The Myst Dong Khoi ,5-Star,"6-8 Ho Huan Nghiep Street, Bến Nghé Ward, District 1","10.775024025643665, 106.70538752379258",10.77502403,106.7053875
+Hilton Saigon,5-Star,"11 Me Linh Square, Bến Nghé Ward, District 1","10.775142292936714, 106.70573186418348",10.77514229,106.7057319
+JW Marriott Hotel & Suites Saigon,5-Star,"39 Le Duan Boulevard, Bến Nghé Ward, District 1","10.78099658590943, 106.70042342881965",10.78099659,106.7004234
+Sofitel Saigon Plaza,5-Star,"17 Le Duan Boulevard, Bến Nghé Ward, District 1","10.784220219056389, 106.70267150887672",10.78422022,106.7026715
+Lotte Hotel Saigon,5-Star,"2A-4A Ton Duc Thang Street, Bến Nghé Ward, District 1","10.778779603467044, 106.70687105305151",10.7787796,106.7068711
+Le Méridien Saigon,5-Star,"3C Ton Duc Thang Street, Bến Nghé Ward, District 1","10.780146521343454, 106.70727543586693",10.78014652,106.7072754
+Renaissance Riverside Hotel Saigon,5-Star,"15 Ton Duc Thang Street, Bến Nghé Ward, District 1","10.774600243541904, 106.70613707819693",10.77460024,106.7061371
+Hotel Indigo Saigon the City,5-Star,"10-12 Ly Tu Trong Street, Bến Nghé Ward, District 1","10.782418380647256, 106.70518162237182",10.78241838,106.7051816
+La Siesta Premium Saigon,5-Star,"180 Ly Tu Trong Street, Bến Thành Ward, District 1","10.773242725217457, 106.69576572237169",10.77324273,106.6957657
+New World Saigon Hotel,5-Star,"76 Le Lai Street, Bến Thành Ward, District 1","10.771029986639055, 106.69521115120658",10.77102999,106.6952112
+Fusion Original Saigon Centre,5-Star,"65 Le Loi Boulevard, Bến Thành Ward, District 1","10.773749004383333, 106.70126322237161",10.773749,106.7012632
+Pullman Saigon Centre,5-Star,"148 Tran Hung Dao Boulevard, Nguyễn Cư Trinh Ward, District 1","10.764453569949664, 106.69172433771139",10.76445357,106.6917243
+Hotel Continental Saigon,4-Star,"132-134 Dong Khoi Street, Bến Nghé Ward, District 1","10.777116221082213, 106.70242739169196",10.77711622,106.7024274
+Liberty Central Saigon Riverside,4-Star,"17 Ton Duc Thang Street, Bến Nghé Ward, District 1","10.77428114088544, 106.70618177754167",10.77428114,106.7061818
+Liberty Central Saigon Citypoint,4-Star,"59 Pasteur Street, Bến Nghé Ward, District 1","10.774822003706264, 106.7007450107213",10.774822,106.700745
+Muong Thanh Grand Saigon Centre,4-Star,"8A Nguyen Sieu Street, Bến Nghé Ward, District 1","10.784383837022574, 106.70053636470202",10.78438384,106.7005364
+Bay Hotel Ho Chi Minh,4-Star,"7 Ngo Van Nam Street, Bến Nghé Ward, District 1","10.780839799907609, 106.70693576654664",10.7808398,106.7069358
+Silverland Mây Hotel,4-Star,"28 Thi Sach Street, Bến Nghé Ward, District 1","10.77934901943819, 106.7040035223718",10.77934902,106.7040035
+Silverland Jolie Hotel,4-Star,"4D Thi Sach Street, Bến Nghé Ward, District 1","10.777421562469007, 106.7058827512067",10.77742156,106.7058828
+Me Saigon Boutique Hotel,4-Star,"10A Ngo Van Nam Street, Bến Nghé Ward, District 1","10.772004287204995, 106.69542506654648",10.77200429,106.6954251
+Norfolk Hotel Saigon,4-Star,"117 Le Thanh Ton Street, Bến Nghé Ward, District 1","10.781194386381777, 106.70404360331285",10.78119439,106.7040436
+Au Lac Charner Hotel,4-Star,"87-89-91 Ham Nghi Boulevard, Bến Nghé Ward, District 1","10.772314705288313, 106.70349280703176",10.77231471,106.7034928
+Silverland Yen Hotel,4-Star,"73-75 Huyen Tran Cong Chua, Bến Thành Ward, District 1","10.774875084616717, 106.69628030887654",10.77487508,106.6962803
+Liberty Central Saigon Centre,4-Star,"179 Le Thanh Ton Street, Bến Thành Ward, District 1","10.773626845951153, 106.69866170994774",10.77362685,106.6986617
+Wink Hotel Saigon Center,4-Star,"75 Nguyen Binh Khiem Street, Đa Kao Ward, District 1","10.791409175912486, 106.70048419353702",10.79140918,106.7004842
+Oscar Saigon Hotel,3-Star,"68A Nguyen Hue Boulevard, Bến Nghé Ward, District 1","10.774938405219002, 106.70325782052689",10.77493841,106.7032578
+Roseland Sweet Hotel,3-Star,"4M-4N Le Thanh Ton Street, Bến Nghé Ward, District 1","10.778931922025222, 106.70480173586692",10.77893192,106.7048017
+Calista Saigon Hotel,3-Star,"247 Ly Tu Trong Street, Bến Thành Ward, District 1","10.772513304010436, 106.69493260887653",10.7725133,106.6949326
+Nicecy Boutique Hotel,3-Star,"27-29 Le Thanh Ton Street, Bến Thành Ward, District 1","10.771934505528206, 106.69618028004163",10.77193451,106.6961803
+Adora Hotel Bến Thành,3/4-Star,"42-44 Thu Khoa Huan Street, Bến Thành Ward, District 1","10.773305331158712, 106.6960601843129",10.77330533,106.6960602
+Adora Art Hotel,3/4-Star,"189-191 Ly Tu Trong Street, Bến Thành Ward, District 1","10.773332223867628, 106.6960683223716",10.77333222,106.6960683
+The Hammock Hotel Fine Arts,3-Star,"59-61 Nguyen Thai Binh Street, Nguyễn Thái Bình Ward, District 1","10.769703427202588, 106.7001760070317",10.76970343,106.700176
+A25 Hotel - Ly Tu Trong,2-Star,"251 Ly Tu Trong Street, Bến Thành Ward, District 1","10.771721546480364, 106.69400015120657",10.77172155,106.6940002
+La Vela Saigon Hotel,5-Star,"280 Nam Ky Khoi Nghia Street, Vo Thi Sau Ward, District 3","10.788838455658771, 106.68551588004182",10.78883846,106.6855159
+Mai House Saigon,5-Star,"157 Ngô Thời Nhiệm Street, Vo Thi Sau Ward, District 3","10.78238983547188, 106.69166682237184",10.78238984,106.6916668
+Hotel Des Arts Saigon MGallery,5-Star,"76-78 Nguyen Thi Minh Khai, Vo Thi Sau Ward, District 3","10.78267187757719, 106.6972783935369",10.78267188,106.6972784
+Lotus Saigon Hotel,4-Star,"120 Cach Mang Thang Tam Street, Vo Thi Sau Ward, District 3","10.777225222983027, 106.68344476470186",10.77722522,106.6834448
+Windsor Plaza Hotel,5-Star,"18 An Duong Vuong Street, Ward 9, District 5","10.75811925725289, 106.67364974509029",10.75811926,106.6736497
+Equatorial Hotel HCMC,5-Star,"242 Tran Binh Trong Street, Ward 4, District 5","10.763285791165945, 106.67920053771137",10.76328579,106.6792005
+The Rivergate Apartments & Condo,4-Star Res.,"151-155 Ben Van Don Street, Ward 6, District 4","10.762624045757978, 106.69883981198151",10.76262405,106.6988398
