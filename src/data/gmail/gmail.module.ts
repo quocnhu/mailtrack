@@ -5,11 +5,9 @@ import { PrismaModule } from '@/prisma/prisma.module'; // ◄ ADD THIS (Adjust p
 import { RedisModule } from '@/redis/redis.module';   // ◄ ADD THIS (Adjust path if needed, e.g., '@/redis/redis.module')
 import { BullModule } from '@nestjs/bull'; // ◄ ADD THIS (For Redis-based queues)
 import { GmailConsumer } from '@/gmail/gmail.consumer'; // ◄ ADD THIS (Your Bull consumer for processing jobs)
-import { BookingModule } from '@/booking/booking.module'; // ◄ ADD THIS (To allow GmailService to call BookingService)
 @Module({
   imports: [
-    BookingModule, // 🚀 Nạp BookingModule vào đây để GmailConsumer có thể @Inject(BookingService)
-    PrismaModule, 
+    PrismaModule, // ◄ CRITICAL: Gives GmailModule access to PrismaService
     RedisModule,  // ◄ CRITICAL: Gives GmailModule access to RedisService
     BullModule.registerQueue({
       name: 'booking-processing-queue', // Creates your custom conveyor belt name
@@ -17,6 +15,6 @@ import { BookingModule } from '@/booking/booking.module'; // ◄ ADD THIS (To al
   ],
   controllers: [GmailController],
   providers: [GmailService, GmailConsumer], // Don't forget to register the consumer!
-  exports: [GmailService,GmailConsumer], // Export if other modules (like BookingModule) need to call GmailService or GmailConsumer
+  exports: [GmailService], 
 })
 export class GmailModule {}

@@ -1,238 +1,258 @@
-import { Processor, Process } from '@nestjs/bull';
-import type { Job } from 'bull';
-import { Logger } from '@nestjs/common';
+// src/gmail/gmail.consumer.ts
+import { Processor, Process, InjectQueue } from '@nestjs/bull';
+import type { Job, Queue } from 'bull';
+import { Logger, Inject } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
-import { RedisService } from '@/redis/redis.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
+import { TourType, BookingStatus, Prisma } from '@prisma/client';
 import { ParsedEmailDto } from './dto/parsedEmail.dto';
-import { TourType, BookingStatus } from '@prisma/client'; 
-
-// 🌐 REAL GOOGLE MAPS IMPORTS (Kept for future use)
-// import { Client as GoogleMapsClient } from '@googlemaps/google-maps-services-js';
+import { GmailParserUtil } from './utils/gmail-parser.util';
 
 @Processor('booking-processing-queue')
 export class GmailConsumer {
   private readonly logger = new Logger(GmailConsumer.name);
-  // private readonly googleMapsClient: GoogleMapsClient; // (Future use)
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly redisService: RedisService,
-  ) {
-    // Initialize the official Google client once when the worker boots up
-    // this.googleMapsClient = new GoogleMapsClient({}); // (Future use)
-  }
+    @InjectQueue('booking-processing-queue')
+    private readonly bookingQueue: Queue,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
+  ) { }
 
-  @Process('process-email-job')
-  async handleEmailJob(job: Job<{ bookingKey: string; payload: ParsedEmailDto }>) {
-    const { bookingKey, payload } = job.data;
-    this.logger.log(`[CONVEYOR BELT OUT] Starting Stage 2 processing for: ${bookingKey}`);
+  /**
+   * 🔥 STAGE 1: HẠ CÁNH SIÊU TỐC & LƯU RAW DATA
+   */
+  @Process('process-raw-email-job')
+  async handleRawEmailJob(job: Job<{ messageId: string; messageData: any }>) {
+    const { messageId, messageData } = job.data;
+    this.logger.log(`[STAGE 1 - RAW] Saving email snapshot for Message ID: ${messageId}`);
 
-    // ─── STEP 1: FAST LANDING GROUNDWORK ─────────────────────────────
-    let rawDataRecord = await this.prisma.rawData.findUnique({
-      where: { sourceId: payload.messageId || bookingKey }
-    });
+    try {
+      const parsed: ParsedEmailDto = GmailParserUtil.parseEmailBody(messageData);
+      const uniqueRef = parsed.bookingData?.bookingRef;
 
-    if (!rawDataRecord) {
-      rawDataRecord = await this.prisma.rawData.create({
-        data: {
-          sourceId: payload.messageId || bookingKey,
-          payload: payload as any,
+      if (!uniqueRef) {
+        this.logger.warn(`[STAGE 1 ABORT] No unique booking reference found in message ${messageId}.`);
+        return;
+      }
+
+      const rawDataRecord = await this.prisma.rawData.upsert({
+        where: { sourceId: messageId },
+        update: {},
+        create: {
+          sourceId: messageId,
+          payload: parsed as unknown as Prisma.InputJsonValue,
           status: 'PENDING',
         },
       });
+
+      await this.bookingQueue.add('enrich-booking-job', {
+        rawId: rawDataRecord.id,
+        uniqueRef,
+        parsedPayload: parsed
+      }, {
+        attempts: 5,
+        backoff: 10000,
+      });
+
+      this.logger.log(`[STAGE 1 SUCCESS] RawData ${messageId} handled smoothly.`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`[STAGE 1 CRITICAL ERROR] Failed to save raw data: ${errorMessage}`);
+      throw error;
     }
+  }
+
+  /**
+   * ⚙️ STAGE 2: PHÂN TÍCH CHUYÊN SÂU & ĐÚC KHUÔN BOOKING
+   */
+  @Process('enrich-booking-job')
+  async handleEnrichBookingJob(job: Job<{ rawId: string; uniqueRef: string; parsedPayload: ParsedEmailDto }>) {
+    const { rawId, uniqueRef, parsedPayload } = job.data;
+    this.logger.log(`[STAGE 2 - ENRICH] Processing heavy business logic for Ref: ${uniqueRef}`);
 
     try {
-      // ─── STEP 2: MULTI-LAYER COST-SAVING GEOCODING LAYER ────────────
-      const rawAddress = payload.bookingData?.hotelAddress || payload.bookingData?.pickupLocation;
-      const hotelName = payload.bookingData?.hotelName || 'Unknown Hotel';
-      
-      let finalCoordinates = { lat: null as number | null, lng: null as number | null };
+      const bookingData = parsedPayload.bookingData;
+      const rawAddress = bookingData?.hotelAddress || bookingData?.pickupLocation;
+      const hotelName = bookingData?.hotelName || 'Unknown Hotel';
 
-      if (rawAddress) {
-        const sanitizedAddress = rawAddress.trim().toLowerCase();
-        const redisGeoKey = `geo:cache:${sanitizedAddress}`;
-
-        // LAYER 1: CHECK REDIS CACHE (RAM) 
-        const cachedCoordinates = await this.redisService.get(redisGeoKey);
-        
-        if (cachedCoordinates) {
-          this.logger.log(`[GEO-CACHE HIT] Found coordinates in Redis RAM for: ${sanitizedAddress}`);
-          finalCoordinates = JSON.parse(cachedCoordinates);
-        } else {
-          
-          // LAYER 2: CHECK POSTGRES TABLE (DATABASE COOLDOWN CACHE)
-          this.logger.log(`[GEO-CACHE MISS] Checking Postgres Coordinate Table for: ${sanitizedAddress}`);
-          const dbCoordinates = await this.prisma.coordinate.findUnique({
-            where: { address: sanitizedAddress },
-          });
-
-          if (dbCoordinates) {
-            this.logger.log(`[GEO-DB HIT] Found coordinates in Postgres Table. Saving to Redis RAM.`);
-            finalCoordinates = { lat: dbCoordinates.latitude, lng: dbCoordinates.longitude };
-            
-            const ONE_MONTH_SECONDS = 30 * 24 * 60 * 60;
-            await this.redisService.set(redisGeoKey, JSON.stringify(finalCoordinates), ONE_MONTH_SECONDS);
-          } else {
-            
-            // 🛑 LAYER 3: REAL GOOGLE API CALL WITH ALLEYWAY FALLBACK (TEMPORARILY DISABLED)
-            this.logger.warn(`[GEO-LOCAL MISS] Address not found in local DB cache. Google API is disabled. Proceeding with null values.`);
-            finalCoordinates = { lat: null, lng: null };
-
-            /* ── UNCOMMENT THIS ENTIRE BLOCK TO RE-ENABLE GOOGLE MAPS API ──
-            this.logger.warn(`[GEO-EXTERNAL] Hitting Google Maps API for: ${sanitizedAddress}`);
-            
-            await this.preventGeocodingSpam(sanitizedAddress);
-
-            try {
-              const googleResult = await this.callGoogleGeocodingApi(rawAddress);
-
-              if (googleResult && googleResult.lat && googleResult.lng) {
-                this.logger.log(`[GEO-GOOGLE SUCCESS] Address resolved. Saving to permanent lookup tables.`);
-                finalCoordinates = { lat: googleResult.lat, lng: googleResult.lng };
-
-                await this.prisma.coordinate.create({
-                  data: {
-                    address: sanitizedAddress,
-                    hotelName: hotelName,
-                    latitude: finalCoordinates.lat || 0, 
-                    longitude: finalCoordinates.lng || 0, 
-                  },
-                });
-
-                const ONE_MONTH_SECONDS = 30 * 24 * 60 * 60;
-                await this.redisService.set(redisGeoKey, JSON.stringify(finalCoordinates), ONE_MONTH_SECONDS);
-              } else {
-                this.logger.warn(`[GEO-GOOGLE NULL] Google could not resolve matching coordinates for "${sanitizedAddress}". Using fallback null fields.`);
-                finalCoordinates = { lat: null, lng: null };
-              }
-            } catch (googleApiError) {
-              this.logger.error(`[GEO-GOOGLE CRASH] External Google HTTP endpoint failure: ${googleApiError.message}`);
-              finalCoordinates = { lat: null, lng: null };
-            }
-            ─────────────────────────────────────────────────────────────── */
-          }
-        }
-      }
-
-      // ─── STEP 3: PAYLOAD CONVERSION & METRIC ARITHMETIC ─────────────
-      const bookingData = payload.bookingData;
       const totalAdults = Number(bookingData?.paxDetail?.adults || 0);
       const totalChildren = Number(bookingData?.paxDetail?.children || 0);
       const totalInfants = Number(bookingData?.paxDetail?.infants || 0);
       const calculatedTotalPax = totalAdults + totalChildren + totalInfants;
 
       let mappedTourType: TourType | null = null;
-      const rawTourNameLower = bookingData?.tourName?.toLowerCase() || '';
-      if (rawTourNameLower.includes('private')) {
-        mappedTourType = TourType.PRIVATE_TOUR;
-      } else if (rawTourNameLower.includes('group')) {
-        mappedTourType = TourType.GROUP_TOUR;
+      if (bookingData?.tourName?.toLowerCase().includes('private')) mappedTourType = TourType.PRIVATE_TOUR;
+      if (bookingData?.tourName?.toLowerCase().includes('group')) mappedTourType = TourType.GROUP_TOUR;
+
+      // ─── 📍 HỆ THỐNG PHÂN PHỐI & TRUY VẾT TỌA ĐỘ 3 TẦNG ───────────────────
+      let latitude: number | null = null;
+      let longitude: number | null = null;
+
+      // Định danh mục tiêu tìm kiếm (Ưu tiên Address, nếu không có thì dùng Hotel Name)
+      const lookupTarget = rawAddress || hotelName;
+
+      if (lookupTarget && lookupTarget !== 'Unknown Hotel') {
+        const cacheKey = `geo:${lookupTarget.trim().toLowerCase()}`;
+
+        try {
+          // 🔎 TẦNG 1: Kiểm tra trên Memory Cache (Redis / In-Memory)
+          const cachedCoords = await this.cacheManager.get<{ lat: number; lng: number }>(cacheKey);
+
+          if (cachedCoords) {
+            this.logger.log(`[GEO-HIT][MEMORY] Found coordinates in Cache for: ${lookupTarget}`);
+            latitude = cachedCoords.lat;
+            longitude = cachedCoords.lng;
+          } else {
+            // 🔎 TẦNG 2: Memory Cache trượt -> Xuống kiểm tra DB qua Prisma
+            this.logger.log(`[GEO-MISS][MEMORY] Checking DB Coordinate table for: ${lookupTarget}`);
+
+            const dbCoordinate = await this.prisma.coordinate.findFirst({
+              where: {
+                OR: [
+                  { address: lookupTarget },
+                  { hotelName: hotelName }
+                ]
+              },
+            });
+
+            if (dbCoordinate) {
+              this.logger.log(`[GEO-HIT][DATABASE] Found coordinates in DB for: ${lookupTarget}`);
+              latitude = dbCoordinate.latitude;
+              longitude = dbCoordinate.longitude;
+
+              // 💾 Bù đắp ngược lại cho Memory Cache giữ trong 1 tháng
+              await this.cacheManager.set(cacheKey, { lat: latitude, lng: longitude }, 30 * 24 * 60 * 60 * 1000);
+            } else {
+              // 🔎 TẦNG 3: Cả hai nơi đều không có -> Gọi API Geocoding thực tế
+              this.logger.log(`[GEO-MISS][ALL] Triggering live Geocoding API for: ${lookupTarget}`);
+
+              let apiLat: number | null = null;
+              let apiLng: number | null = null;
+
+              // 📡 KHỐI GỌI API THỰC TẾ (Uncomment đoạn này khi bạn lắp Key thật vào env)
+              try {
+                /*
+                const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+                const response = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json`, {
+                  params: { address: lookupTarget, key: apiKey },
+                  timeout: 5000 // Chờ tối đa 5 giây
+                });
+                
+                if (response.data.status === 'OK' && response.data.results.length > 0) {
+                  const location = response.data.results[0].geometry.location;
+                  apiLat = location.lat;
+                  apiLng = location.lng;
+                }
+                */
+              } catch (apiError) {
+                const apiErrorMessage = apiError instanceof Error ? apiError.message : String(apiError);
+                this.logger.error(`[GOOGLE API ERROR] Live call failed: ${apiErrorMessage}`);
+                // API lỗi -> Giữ apiLat, apiLng là null để hạ cánh an toàn xuống kịch bản 2
+              }
+
+              // ─── PHÂN TÁCH LÀM 2 TRƯỜNG HỢP XỬ LÝ (KẾT QUẢ TỪ API) ───
+
+              if (apiLat !== null && apiLng !== null) {
+                // ✅ Kịch bản 1: Tìm thấy tọa độ thực tế từ API
+                latitude = apiLat;
+                longitude = apiLng;
+
+                const uniqueField = rawAddress || `hotel-fallback:${hotelName.toLowerCase()}`;
+
+                // 📥 1. Lưu vết vào database Coordinate làm cache vật lý
+                await this.prisma.coordinate.upsert({
+                  where: { address: uniqueField },
+                  update: {
+                    hotelName: hotelName,
+                    latitude: latitude,
+                    longitude: longitude,
+                    coordinate: `${latitude},${longitude}`
+                  },
+                  create: {
+                    hotelName: hotelName,
+                    address: uniqueField,
+                    latitude: latitude,
+                    longitude: longitude,
+                    coordinate: `${latitude},${longitude}`,
+                  },
+                });
+                this.logger.log(`[GEO-SAVED][DATABASE] Saved coordinates to Coordinate table.`);
+
+                // 📥 2. Set Cache bộ nhớ trong 1 tháng giống như tầng 2
+                await this.cacheManager.set(cacheKey, { lat: latitude, lng: longitude }, 30 * 24 * 60 * 60 * 1000);
+                this.logger.log(`[GEO-SAVED][MEMORY] Cached coordinates for 1 month.`);
+
+              } else {
+                // ❌ Kịch bản 2: API không tìm thấy hoặc lỗi kết nối
+                this.logger.warn(`[GEO-NOT-FOUND] Geocoding could not resolve coordinates for: ${lookupTarget}. Skipping cache/DB storage.`);
+
+                // Trả trực tiếp giá trị null ra toán tử xử lý bên ngoài
+                latitude = null;
+                longitude = null;
+              }
+            }
+          }
+        } catch (geoError) {
+          const geoErrorMessage = geoError instanceof Error ? geoError.message : String(geoError);
+          this.logger.warn(`[GEO-ERROR] Geocoding workflow failed: ${geoErrorMessage}. Proceeding with null coordinates.`);
+        }
       }
 
-      let parsedStartingDate: Date | null = null;
-      if (bookingData?.travelDate) {
-        parsedStartingDate = new Date(bookingData.travelDate);
+      // ─── 🛠️ TIẾN HÀNH ĐÚC BẢNG BOOKING (Kế thừa toán tử của bạn) ───────────────────
+      try {
+        await this.prisma.booking.create({
+          data: {
+            bookingRef: uniqueRef, //
+            provider: parsedPayload.provider,//
+            status: BookingStatus.PENDING,//
+            address: rawAddress || null,//
+
+            // 🎯 Toán tử ghi nhận giá trị: 
+            // Nếu qua kịch bản 1: Sẽ nhận giá trị số thực từ API.
+            // Nếu rơi vào kịch bản 2: Nhận giá trị null để toán tử vận hành cập nhật lại sau này.
+            latitude: latitude,//
+            longitude: longitude,//
+
+            startingDate: bookingData?.travelDate ? new Date(bookingData.travelDate) : null, //
+            customerName: bookingData?.customerName || 'Unknown Customer', //
+            phone: bookingData?.customerPhone || null, //
+            mail: bookingData?.customerEmail || null, //
+            totalPax: calculatedTotalPax > 0 ? calculatedTotalPax : (bookingData?.totalPax || 0), //
+            paxDetail: { adults: totalAdults, children: totalChildren, infants: totalInfants } as any, //
+            tourType: mappedTourType, //
+            tourName: bookingData?.tourName || null, //
+            payment: null,
+            rawDataId: rawId,
+          },
+        });
+        this.logger.log(`[POSTGRES] Booking ${uniqueRef} created successfully.`);
+      } catch (dbError) {
+        if (dbError instanceof Prisma.PrismaClientKnownRequestError && dbError.code === 'P2002') {
+          this.logger.warn(`[DUPLICATE BLOCKED] Booking ${uniqueRef} already exists. Skipping insertion smoothly.`);
+        } else {
+          throw dbError;
+        }
       }
 
-      // ─── STEP 4: WRITE FINAL STRUCTURED BOOKING RECORD ─────────────
-      await this.prisma.booking.create({
-        data: {
-          bookingRef: bookingData?.bookingRef || `REF-${Date.now()}`,
-          provider: payload.provider,
-          status: BookingStatus.PENDING, 
-          
-          address: rawAddress || null,
-          latitude: finalCoordinates.lat,
-          longitude: finalCoordinates.lng,
-          
-          startingDate: parsedStartingDate,
-
-          customerName: bookingData?.customerName || 'Unknown Customer',
-          phone: bookingData?.customerPhone || null,
-          mail: bookingData?.customerEmail || null, 
-          
-          totalPax: calculatedTotalPax > 0 ? calculatedTotalPax : (bookingData?.totalPax || 0),
-          paxDetail: {
-            adults: totalAdults,
-            children: totalChildren,
-            infants: totalInfants
-          } as any,
-
-          tourType: mappedTourType,
-          tourName: bookingData?.tourName || 'Standard Tour',
-          
-          payment: null, 
-          rawDataId: rawDataRecord.id, 
-        },
-      });
-
-      // ─── STEP 5: CLOSE PIPELINE STEP STATE ──────────────────────────
+      // 🎉 Chuyển trạng thái RawData sang PROCESSED
       await this.prisma.rawData.update({
-        where: { id: rawDataRecord.id },
-        data: { status: 'PROCESSED' },
+        where: { id: rawId },
+        data: { status: 'PROCESSED' }
       });
-
-      this.logger.log(`[COMPLETED SUCCESS] Booking pipeline closed cleanly for reference key: ${bookingKey}.`);
+      this.logger.log(`[STAGE 2 SUCCESS] RawData ${rawId} status updated to PROCESSED.`);
 
     } catch (error) {
-      this.logger.error(`[PIPELINE FAILURE] Failed processing booking metrics: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`[STAGE 2 FAILURE] Error enriching booking database: ${errorMessage}`);
+
       await this.prisma.rawData.update({
-        where: { id: rawDataRecord.id },
-        data: { status: 'FAILED' },
+        where: { id: rawId },
+        data: { status: 'FAILED' }
       });
-      throw error; 
+      throw error;
     }
   }
-
-  /**
-   * ─── REAL GOOGLE GEOCODING API IMPLEMENTATION (Kept for future use)
-   */
-  /* private async callGoogleGeocodingApi(address: string): Promise<{ lat: number, lng: number } | null> {
-    try {
-      const response = await this.googleMapsClient.geocode({
-        params: {
-          address: address,
-          key: process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_FALLBACK',
-        },
-        timeout: 5000, 
-      });
-
-      if (response.data.results && response.data.results.length > 0) {
-        const location = response.data.results[0].geometry.location;
-        return {
-          lat: location.lat,
-          lng: location.lng,
-        };
-      }
-
-      return null;
-    } catch (error) {
-      this.logger.error(`[GOOGLE MAPS SDK ERROR] Failed fetching address payload: ${error.message}`);
-      throw error; 
-    }
-  }
-  */
-
-  /**
-   * Anti-Spam Layer Strategy Tracker (Kept for future use)
-   */
-  /*
-  private async preventGeocodingSpam(sanitizedAddress: string): Promise<void> {
-    const rateLimitKey = `geo:limit:window`;
-    const currentHits = await this.redisService.get(rateLimitKey);
-    const limit = 20; 
-
-    if (currentHits && Number(currentHits) >= limit) {
-      this.logger.error(`[ANTI-SPAM ALERT] Geocoding system ceiling threshold reached (${currentHits}/${limit}).`);
-      throw new Error('Geocoding system rate limit triggered. Postponing job execution for cooldown.');
-    }
-
-    if (!currentHits) {
-      await this.redisService.set(rateLimitKey, '1', 60); 
-    } else {
-      await this.redisService.incr(rateLimitKey);
-    }
-  }
-  */
 }
