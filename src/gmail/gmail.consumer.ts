@@ -8,6 +8,7 @@ import type { Cache } from 'cache-manager';
 import { TourType, BookingStatus, Prisma } from '@prisma/client';
 import { ParsedEmailDto } from './dto/parsedEmail.dto';
 import { GmailParserUtil } from './utils/gmail-parser.util';
+import { BookingService } from '../booking/booking.service'; // Import BookingService để gọi từ đây
 
 @Processor('booking-processing-queue')
 export class GmailConsumer {
@@ -19,6 +20,7 @@ export class GmailConsumer {
     private readonly bookingQueue: Queue,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly bookingService: BookingService, // Inject BookingService
   ) { }
 
   /**
@@ -203,31 +205,31 @@ export class GmailConsumer {
 
       // ─── 🛠️ TIẾN HÀNH ĐÚC BẢNG BOOKING (Kế thừa toán tử của bạn) ───────────────────
       try {
-        await this.prisma.booking.create({
-          data: {
-            bookingRef: uniqueRef, //
-            provider: parsedPayload.provider,//
-            status: BookingStatus.PENDING,//
-            address: rawAddress || null,//
+        await this.bookingService.create(
+          {
+            bookingRef: uniqueRef, 
+            provider: parsedPayload.provider,
+            status: BookingStatus.PENDING,
+            address: rawAddress || null,
 
             // 🎯 Toán tử ghi nhận giá trị: 
             // Nếu qua kịch bản 1: Sẽ nhận giá trị số thực từ API.
             // Nếu rơi vào kịch bản 2: Nhận giá trị null để toán tử vận hành cập nhật lại sau này.
-            latitude: latitude,//
-            longitude: longitude,//
+            latitude: latitude,
+            longitude: longitude,
 
-            startingDate: bookingData?.travelDate ? new Date(bookingData.travelDate) : null, //
-            customerName: bookingData?.customerName || 'Unknown Customer', //
-            phone: bookingData?.customerPhone || null, //
-            mail: bookingData?.customerEmail || null, //
+            startingDate: bookingData?.travelDate || null, 
+            customerName: bookingData?.customerName || 'Unknown Customer', 
+            phone: bookingData?.customerPhone || null, 
+            mail: bookingData?.customerEmail || null, 
             totalPax: calculatedTotalPax > 0 ? calculatedTotalPax : (bookingData?.totalPax || 0), //
             paxDetail: { adults: totalAdults, children: totalChildren, infants: totalInfants } as any, //
             tourType: mappedTourType, //
-            tourName: bookingData?.tourName || null, //
+            tourName: bookingData?.tourName || null, 
             payment: null,
-            rawDataId: rawId,
+            rawDataId: rawId || null, // Liên kết thô với RawData để dễ dàng truy vết nguồn gốc
           },
-        });
+        );
         this.logger.log(`[POSTGRES] Booking ${uniqueRef} created successfully.`);
       } catch (dbError) {
         if (dbError instanceof Prisma.PrismaClientKnownRequestError && dbError.code === 'P2002') {

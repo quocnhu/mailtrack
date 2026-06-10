@@ -5,15 +5,15 @@ import { TourType, BookingStatus, PaymentStatus } from '@prisma/client';
 export class CreateBookingDto {
   @IsString()
   @IsNotEmpty()
-  bookingRef!: string;
+  bookingRef?: string;
 
   @IsString()
   @IsNotEmpty()
-  provider!: string;
+  provider?: string | null;
 
   @IsEnum(BookingStatus)
   @IsOptional()
-  status?: BookingStatus;
+  status!: BookingStatus;
 
   @IsString()
   @IsOptional()
@@ -48,7 +48,7 @@ export class CreateBookingDto {
   @IsOptional()
   totalPax?: number;
 
-  // 🎯 GỘP THẲNG VÀO ĐÂY: Định nghĩa trực tiếp kiểu dáng Object cho paxDetail
+
   @IsObject()
   @IsOptional()
   paxDetail?: {
@@ -71,5 +71,5 @@ export class CreateBookingDto {
 
   @IsString()
   @IsNotEmpty()
-  rawDataId!: string;
+  rawDataId?: string | null; // Liên kết thô với RawData để dễ dàng truy vết nguồn gốc
 }

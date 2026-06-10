@@ -8,6 +8,7 @@ import { RedisModule } from '@/redis/redis.module';
 import { PrismaModule } from '@/prisma/prisma.module'; // ◄ ADD THIS (Adjust path if needed, e.g., '@/prisma/prisma.module')
 import { BullModule } from '@nestjs/bull';
 import { DataModule } from './data/data.module';
+import {BookingModule} from './booking/booking.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -22,6 +23,7 @@ import { DataModule } from './data/data.module';
     RedisModule,
     PrismaModule, 
     DataModule,//test data import
+    BookingModule,
   ],
   providers: [AppService],
   controllers: [AppController],

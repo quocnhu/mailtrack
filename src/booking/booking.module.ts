@@ -8,7 +8,7 @@ import { BullModule } from '@nestjs/bull'; // 🎯 Thêm BullModule vào đây
   imports: [
     PrismaModule, 
     BullModule.registerQueue({
-      name: 'booking-processing-queue', 
+      name: 'booking-assignment-queue',
     })],  
   controllers: [BookingController],
   providers: [BookingService],
