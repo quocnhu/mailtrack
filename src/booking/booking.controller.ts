@@ -5,7 +5,7 @@ import { CreateBookingDto } from '@/booking/dto/create-booking.dto';
 
 @Controller('bookings')
 export class BookingController {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(private readonly bookingService: BookingService) { }
 
   /**
    * 📥 API Tạo mới Booking thủ công (Hoặc dùng cho Operator cập nhật/chèn đè sau này)
@@ -16,11 +16,12 @@ export class BookingController {
     return await this.bookingService.create(createBookingDto);
   }
 
-  // /**
-  //  * 🔍 API Lấy thông tin chi tiết một Booking theo Mã Tham Chiếu (BookingRef)
-  //  */
-  // @Get(':ref')
-  // async getBookingByRef(@Param('ref') ref: string) {
-  //   return await this.bookingService.findByRef(ref);
-  // }
+  /**
+    * 📋 API Lấy danh sách toàn bộ Bookings cho Ant Design Table
+    * Lộ trình: GET /bookings
+    */
+  @Get()
+  async getAllBookings() {
+    return await this.bookingService.findAll();
+  }
 }

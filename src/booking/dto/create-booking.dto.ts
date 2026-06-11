@@ -37,6 +37,10 @@ export class CreateBookingDto {
 
   @IsString()
   @IsOptional()
+  hotelName?: string;
+
+  @IsString()
+  @IsOptional()
   phone?: string | null;
 
   @IsEmail()
@@ -51,11 +55,7 @@ export class CreateBookingDto {
 
   @IsObject()
   @IsOptional()
-  paxDetail?: {
-    adults: number;
-    children: number;
-    infants: number;
-  };
+  paxDetail?: string | null;
 
   @IsEnum(TourType)
   @IsOptional()

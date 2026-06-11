@@ -62,7 +62,7 @@ export class GmailParserUtil {
     const lowerSubject = subject.toLowerCase();
 
     const status = lowerSubject.includes('cancel') || lowerSubject.includes('cancellation') || lowerSubject.includes('cancelled')
-      ? 'CANCEL' : 'NEW_BOOKING';
+      ? 'CANCEL' : 'NEW_BOOKING'; //  I NEED TO CHECK RIGHT HERE, BECAUSE TRASH MAIL IS ALSO NEW BOOKING 
 
     const provider = this.detectProvider(headers);
     const bookingData = this.parseBookingData(provider, htmlBody);

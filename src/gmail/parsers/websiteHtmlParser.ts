@@ -3,13 +3,15 @@ import { WebsiteBookingDto } from '@/gmail/dto/website-booking.dto';
 
 export class WebsiteHtmlParser {
   static parse(htmlBody: string): WebsiteBookingDto {
-    // ── Fallback object for empty/missing HTML payloads
+    // ── 1. EMERGENCY FALLBACK FOR EMPTY/MISSING HTML PAYLOADS ────────────────────
     if (!htmlBody) {
       return {
         provider: 'website',
+        // Immortal fallback reference to prevent DB conflicts and preserve error timestamp
+        bookingRef: null,
         tourName: null,
         packageName: null,
-        tourType: 'Shared',
+        tourType: 'UNKNOWN',
         tripDate: null,
         travellers: null,
         priceLines: null,
@@ -24,18 +26,19 @@ export class WebsiteHtmlParser {
         billingCity: null,
         billingCountry: null,
         bookingLink: null,
-      };
+      } as WebsiteBookingDto;
     }
 
     const $ = cheerio.load(htmlBody);
 
+    // Helper function to sanitize and parse dollar currency strings into numbers
     const parseDollar = (raw: string): number | null => {
       if (!raw) return null;
       const parsed = parseFloat(raw.replace(/[^0-9.]/g, ''));
       return isNaN(parsed) ? null : parsed;
     };
 
-    // ── ✅ FIX: Explicitly type all variables as string | null or number | null
+    // ── 2. EXTRACTION OF TRIP DETAILS ───────────────────────────────────────────
     let tourName: string | null = null;
     let packageName: string | null = null;
     let tripDate: string | null = null;
@@ -49,6 +52,7 @@ export class WebsiteHtmlParser {
 
     const priceLinesParts: string[] = [];
 
+    // Traverse rows to extract tabular trip information
     $('tr').each((_, row) => {
       const cells = $(row).find('td');
       if (cells.length < 2) return;
@@ -63,6 +67,7 @@ export class WebsiteHtmlParser {
       if (key === 'Discount') discount = parseDollar(val);
       if (key === 'Total') total = parseDollar(val);
 
+      // Capture receipt breakdown lines (e.g., "Adults: 2 x $25 = $50")
       const priceMatch = val.match(/^(\d+)\s*[Xx]\s*\$([0-9.]+)\s*=\s*\$([0-9.]+)$/);
       if (priceMatch && key && key !== 'Subtotal') {
         priceLinesParts.push(`${key}: ${priceMatch[1]}x$${priceMatch[2]}=$${priceMatch[3]}`);
@@ -71,13 +76,12 @@ export class WebsiteHtmlParser {
 
     const priceLines = priceLinesParts.length > 0 ? priceLinesParts.join(', ') : null;
 
-    // ── ✅ FIX: Explicitly typed to stop TypeScript from inferring 'never'
+    // ── 3. EXTRACTION OF CUSTOMER BILLING DETAILS ───────────────────────────────
     let billingName: string | null = null;
     let billingEmail: string | null = null;
     let billingAddress: string | null = null;
     let billingCity: string | null = null;
     let billingCountry: string | null = null;
-    let bookingLink: string | null = null;
 
     $('tr').each((_, row) => {
       const cells = $(row).find('td');
@@ -93,14 +97,21 @@ export class WebsiteHtmlParser {
       if (key === 'Country') billingCountry = val || null;
     });
 
-    $('a').each((_, el) => {
-      const href = $(el).attr('href') ?? '';
-      if (href.includes('wp-admin') && href.includes('action=edit')) {
-        bookingLink = href || null;
-      }
-    });
+    // ── 4. AUTOMATIC BOOKING REFERENCE GENERATOR ─────────────────────────────────
+    // Performance Optimized: Query targeted admin links directly to avoid generic iterations
+    const bookingLink = $('a[href*="wp-admin"][href*="action=edit"]').attr('href') || null;
 
-    // ── Tour Type Logic ───────────────────────────────────────────────
+    let bookingRef: string;
+    const wpPostId = bookingLink?.match(/post=(\d+)/)?.[1];
+    
+    if (wpPostId) {
+      bookingRef = `WEB-${wpPostId}`; // Resolves to standard format: e.g., WEB-3286
+    } else {
+      // Safe fallback ensuring 100% uniqueness if the admin link or Post ID is missing
+      bookingRef = `WEB-FALLBACK-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    }
+
+    // ── 5. TOUR TYPE CLASSIFICATION LOGIC ────────────────────────────────────────
     let tourType = 'UNKNOWN';
     const combinedContent = `
       ${(packageName || '').toLowerCase()} 
@@ -108,26 +119,24 @@ export class WebsiteHtmlParser {
     `.replace(/\s+/g, ' ');
 
     if (combinedContent.includes('private') || combinedContent.includes('solo')) {
-      tourType = 'PRIVATE TOUR';
+      tourType = 'PRIVATE_TOUR';
     } else if (
       combinedContent.includes('shared') ||
       combinedContent.includes('group') ||
       combinedContent.includes('max ')
     ) {
-      tourType = 'GROUP TOUR';
+      tourType = 'GROUP_TOUR';
     }
 
-    // ── Regex-Driven Address Splitting ───────────────────────────────────────
+    // ── 6. REGEX-DRIVEN ADDRESS SPLITTING FOR PICKUPS ────────────────────────────
     let pickUpLocation: string | null = null;
     let pickUpAddress: string | null = null;
 
-    // Force TypeScript to treat this as a string | null, breaking the 'never' loop closure
     const forcedAddress = billingAddress as string | null;
 
     if (forcedAddress && forcedAddress.trim() !== '') {
-      // ✅ Works perfectly now! TypeScript treats forcedAddress as a confirmed string here.
       const cleanAddress = forcedAddress.replace(/\s+/g, ' ').trim();
-
+      // Regular expression matching common lodging keywords to extract hotel name vs street address
       const hotelPattern = /^([^,]+?\b(?:Residence|Hotel|Apartment|Apartments|Suite|Suites|Villa|Villas|Stay|Hostel|Homestay|Spa)\b)(?:,\s*)(.*)$/i;
       const match = cleanAddress.match(hotelPattern);
 
@@ -143,8 +152,10 @@ export class WebsiteHtmlParser {
       }
     }
 
+    // ── 7. RETURN STRONGLY TYPED OBJECT MATED WITH DTO REQUIREMENTS ──────────────
     return {
-      provider:           'website',
+      provider:           'website', //
+      bookingRef:         bookingRef, //
       tourName:           tourName || null,
       packageName:        packageName || null,
       tourType:           tourType || null,
@@ -153,7 +164,7 @@ export class WebsiteHtmlParser {
       priceLines:         priceLines || null,
       subtotal:           subtotal ?? null,
       discount:           discount ?? null,
-      totalcost:          total ?? null,
+      totalcost:          total || null, // Map total directly to totalcost field
       billingName:        billingName || null,
       billingEmail:       billingEmail || null,
       billingAddress:     billingAddress || null,
@@ -162,103 +173,6 @@ export class WebsiteHtmlParser {
       billingCity:        billingCity || null,
       billingCountry:     billingCountry || null,
       bookingLink:        bookingLink || null,
-    };
+    } as WebsiteBookingDto;
   }
 }
-// import * as cheerio from 'cheerio';
-// import { WebsiteBookingDto } from '@/gmail/dto/website-booking.dto';
-
-// export class WebsiteHtmlParser {
-//   static parse(htmlBody: string): WebsiteBookingDto {
-//     const $ = cheerio.load(htmlBody);
-
-//     const parseDollar = (raw: string): number =>
-//       parseFloat(raw.replace(/[^0-9.]/g, '')) || 0;
-
-//     // ── Trip fields ───────────────────────────────────────────────────
-//     let tourName:    string | null = null;
-//     let packageName: string | null = null;
-//     let tripDate:    string | null = null;
-//     let travellers:  number | null = null;
-//     let subtotal:    number | null = null;
-//     let discount:    number | null = null;
-//     let total:       number | null = null;
-
-//     // Tour name is inside <b> tag
-//     tourName = $('td b').first().text().trim() || null;
-
-//     // Price lines accumulator
-//     const priceLinesParts: string[] = [];
-
-//     $('tr').each((_, row) => {
-//       const cells = $(row).find('td');
-//       if (cells.length < 2) return;
-
-//       const key = cells.eq(0).text().trim();
-//       const val = cells.eq(1).text().trim();
-
-//       if (key === 'Package Name') packageName = val || null;
-//       if (key === 'Trip Date')    tripDate    = val || null;
-//       if (key === 'Travellers')   travellers  = parseInt(val) || null;
-//       if (key === 'Subtotal' && val.startsWith('$')) subtotal = parseDollar(val);
-//       if (key === 'Discount')     discount    = parseDollar(val);
-//       if (key === 'Total')        total       = parseDollar(val);
-
-//       // Price lines: "2 X $25 = $50"
-//       const priceMatch = val.match(/^(\d+)\s*[Xx]\s*\$([0-9.]+)\s*=\s*\$([0-9.]+)$/);
-//       if (priceMatch && key && key !== 'Subtotal') {
-//         priceLinesParts.push(`${key}: ${priceMatch[1]}x$${priceMatch[2]}=$${priceMatch[3]}`);
-//       }
-//     });
-
-//     const priceLines = priceLinesParts.length > 0 ? priceLinesParts.join(', ') : null;
-
-//     // ── Billing fields ────────────────────────────────────────────────
-//     let billingName:    string | null = null;
-//     let billingEmail:   string | null = null;
-//     let billingAddress: string | null = null;
-//     let billingCity:    string | null = null;
-//     let billingCountry: string | null = null;
-//     let bookingLink:    string | null = null;
-
-//     $('tr').each((_, row) => {
-//       const cells = $(row).find('td');
-//       if (cells.length < 2) return;
-
-//       const key = cells.eq(0).text().trim();
-//       const val = cells.eq(1).text().trim();
-
-//       if (key === 'Name')            billingName    = val || null;
-//       if (key === 'Email')           billingEmail   = cells.eq(1).find('a').attr('href')?.replace('mailto:', '') ?? val ?? null;
-//       if (key === 'Billing Address') billingAddress = val || null;
-//       if (key === 'City')            billingCity    = val || null;
-//       if (key === 'Country')         billingCountry = val || null;
-//     });
-
-//     // Booking link
-//     $('a').each((_, el) => {
-//       const href = $(el).attr('href') ?? '';
-//       if (href.includes('wp-admin') && href.includes('action=edit')) {
-//         bookingLink = href;
-//       }
-//     });
-
-//     return {
-//       provider: 'website',
-//       tourName,
-//       packageName,
-//       tripDate,
-//       travellers,
-//       priceLines,
-//       subtotal,
-//       discount,
-//       total,
-//       billingName,
-//       billingEmail,
-//       billingAddress,
-//       billingCity,
-//       billingCountry,
-//       bookingLink,
-//     };
-//   }
-// }

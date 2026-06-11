@@ -1,16 +1,19 @@
 import { Module } from '@nestjs/common';
 import { GmailController } from '@/gmail/gmail.controller';
 import { GmailService } from '@/gmail/gmail.service';
-import { PrismaModule } from '@/prisma/prisma.module'; // ◄ ADD THIS (Adjust path if needed, e.g., '@/prisma/prisma.module')
-import { RedisModule } from '@/redis/redis.module';   // ◄ ADD THIS (Adjust path if needed, e.g., '@/redis/redis.module')
-import { BullModule } from '@nestjs/bull'; // ◄ ADD THIS (For Redis-based queues)
-import { GmailConsumer } from '@/gmail/gmail.consumer'; // ◄ ADD THIS (Your Bull consumer for processing jobs)
-import { BookingModule } from '@/booking/booking.module'; // ◄ ADD THIS (To allow GmailService to call BookingService)
+import { PrismaModule } from '@/prisma/prisma.module'; 
+import { RedisModule } from '@/redis/redis.module';  
+import { BullModule } from '@nestjs/bull'; 
+import { GmailConsumer } from '@/gmail/gmail.consumer'; 
+import { BookingModule } from '@/booking/booking.module'; 
+import { CacheModule } from '@nestjs/cache-manager';
+
 @Module({
   imports: [
     BookingModule, // 🚀 Nạp BookingModule vào đây để GmailConsumer có thể @Inject(BookingService)
     PrismaModule, 
     RedisModule,  // ◄ CRITICAL: Gives GmailModule access to RedisService
+    CacheModule.register(), // ◄ ADD THIS: Provides CACHE_MANAGER
     BullModule.registerQueue({
       name: 'booking-processing-queue', // Creates your custom conveyor belt name
     }),

@@ -80,15 +80,16 @@ model Booking {
 
   // Passenger Details Extracted From Payload
   customerName String?
+  hotelName    String?
   phone        String?
   mail         String?       
   totalPax     Int           @default(0)
-  paxDetail    Json?         // Stores object: { adults: X, children: Y, infants: Z }
+  paxDetail    String?         
 
   // Enums & Dynamic Names
   tourType     TourType?    
   tourName     String?       
-  payment      PaymentStatus?
+  payment      PaymentStatus? @default(PENDING)
 
   // Core Audit Relation (The only remaining connection!)
   rawDataId    String?        @unique

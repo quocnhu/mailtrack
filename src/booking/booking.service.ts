@@ -31,6 +31,7 @@ export class BookingService {
           longitude: dto.longitude ?? null, 
           startingDate: dto.startingDate ? new Date(dto.startingDate) : null,
           customerName: dto.customerName?.trim() || 'Unknown Customer',
+          hotelName: dto.hotelName?.trim() || 'Unknown Hotel',
           phone: dto.phone || null,
           mail: dto.mail || null,
           totalPax: dto.totalPax || 0,
@@ -86,4 +87,22 @@ export class BookingService {
       throw new InternalServerErrorException('Đã xảy ra lỗi hệ thống trong quá trình xử lý đơn hàng.');
     }
   }
+
+  /**
+   * 📋 Tìm kiếm toàn bộ Bookings xếp theo ngày tạo mới nhất
+   */
+  async findAll() {
+    try {
+      return await this.prisma.booking.findMany({
+        orderBy: {
+          id: 'desc', // Sắp xếp bản ghi mới tạo hiển thị lên đầu bảng điều khiển
+        },
+      });
+    } catch (error) {
+      console.error('[Prisma Error] Không thể truy vấn danh sách bookings:', error);
+      throw new InternalServerErrorException('Không thể tải danh sách đơn hàng từ máy chủ.');
+    }
+  }
 }
+
+

@@ -3,6 +3,7 @@
 export class WebsiteBookingDto {
   provider!: string; // "website"
   // ── Trip ──────────────────────────────────────────────────────────────
+  bookingRef!:     string | null;    // "HNT-3286-20260413-0001"
   tourName!:       string | null;    // "Cu Chi Ben Duoc Tunnels: Authentic & Less Touristy"
   packageName!:    string | null;    // "Shared Group Of 10 Max 7:30 AM"
   tripDate!:       string | null;    // "2026-04-13"
