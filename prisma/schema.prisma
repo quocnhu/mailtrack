@@ -22,6 +22,7 @@ enum PaymentStatus {
 enum BookingStatus {
   PENDING
   ASSIGNED
+  CANCELED 
 }
 
 // ─── GMAIL ACCOUNT MODEL ─────────────────────────────────────────────
@@ -97,6 +98,23 @@ model Booking {
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+
+  // 🎯 Add these operational fields right here:
+  vehicleId    String?       // Tracks which bus layout container this booking belongs to
+  lanePosition String?       // Tracks visual dispatch grouping metadata
+
+  // 🔗 Establish the relation link to the Assignment model
+  assignment   Assignment?
+}
+
+model Assignment {
+  id            String   @id @default(uuid())
+  bookingId     String   @unique // Matches Booking.id type (String)
+  vehicleId     String
+  sequenceIndex Int
+
+  // 🔗 Explicit relationship configuration mapping back to your parent booking table
+  booking       Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
 
 model AuditLog {

@@ -1,57 +1,15 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
-/******/ 	var __webpack_modules__ = ({
+/******/ 	var __webpack_modules__ = ([
+/* 0 */,
+/* 1 */
+/***/ ((module) => {
 
-/***/ "./src/app.controller.ts"
-/*!*******************************!*\
-  !*** ./src/app.controller.ts ***!
-  \*******************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+module.exports = require("@nestjs/core");
 
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var _a;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AppController = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const app_service_1 = __webpack_require__(/*! ./app.service */ "./src/app.service.ts");
-let AppController = class AppController {
-    appService;
-    constructor(appService) {
-        this.appService = appService;
-    }
-    getHello() {
-        return this.appService.getHello();
-    }
-};
-exports.AppController = AppController;
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", String)
-], AppController.prototype, "getHello", null);
-exports.AppController = AppController = __decorate([
-    (0, common_1.Controller)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof app_service_1.AppService !== "undefined" && app_service_1.AppService) === "function" ? _a : Object])
-], AppController);
-
-
-/***/ },
-
-/***/ "./src/app.module.ts"
-/*!***************************!*\
-  !*** ./src/app.module.ts ***!
-  \***************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+/***/ }),
+/* 2 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -62,17 +20,17 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const schedule_1 = __webpack_require__(/*! @nestjs/schedule */ "@nestjs/schedule");
-const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
-const gmail_module_1 = __webpack_require__(/*! @/gmail/gmail.module */ "./src/gmail/gmail.module.ts");
-const app_controller_1 = __webpack_require__(/*! @/app.controller */ "./src/app.controller.ts");
-const app_service_1 = __webpack_require__(/*! @/app.service */ "./src/app.service.ts");
-const redis_module_1 = __webpack_require__(/*! @/redis/redis.module */ "./src/redis/redis.module.ts");
-const prisma_module_1 = __webpack_require__(/*! @/prisma/prisma.module */ "./src/prisma/prisma.module.ts");
-const bull_1 = __webpack_require__(/*! @nestjs/bull */ "@nestjs/bull");
-const data_module_1 = __webpack_require__(/*! ./data/data.module */ "./src/data/data.module.ts");
-const booking_module_1 = __webpack_require__(/*! ./booking/booking.module */ "./src/booking/booking.module.ts");
+const common_1 = __webpack_require__(3);
+const schedule_1 = __webpack_require__(4);
+const config_1 = __webpack_require__(5);
+const gmail_module_1 = __webpack_require__(6);
+const app_controller_1 = __webpack_require__(30);
+const app_service_1 = __webpack_require__(31);
+const redis_module_1 = __webpack_require__(14);
+const prisma_module_1 = __webpack_require__(13);
+const bull_1 = __webpack_require__(12);
+const data_module_1 = __webpack_require__(32);
+const booking_module_1 = __webpack_require__(26);
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -98,102 +56,27 @@ exports.AppModule = AppModule = __decorate([
 ], AppModule);
 
 
-/***/ },
+/***/ }),
+/* 3 */
+/***/ ((module) => {
 
-/***/ "./src/app.service.ts"
-/*!****************************!*\
-  !*** ./src/app.service.ts ***!
-  \****************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+module.exports = require("@nestjs/common");
 
+/***/ }),
+/* 4 */
+/***/ ((module) => {
 
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.AppService = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-let AppService = class AppService {
-    getHello() {
-        return 'Hello World!';
-    }
-};
-exports.AppService = AppService;
-exports.AppService = AppService = __decorate([
-    (0, common_1.Injectable)()
-], AppService);
+module.exports = require("@nestjs/schedule");
 
+/***/ }),
+/* 5 */
+/***/ ((module) => {
 
-/***/ },
+module.exports = require("@nestjs/config");
 
-/***/ "./src/booking/booking.controller.ts"
-/*!*******************************************!*\
-  !*** ./src/booking/booking.controller.ts ***!
-  \*******************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var _a, _b;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BookingController = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const booking_service_1 = __webpack_require__(/*! @/booking/booking.service */ "./src/booking/booking.service.ts");
-const create_booking_dto_1 = __webpack_require__(/*! @/booking/dto/create-booking.dto */ "./src/booking/dto/create-booking.dto.ts");
-let BookingController = class BookingController {
-    bookingService;
-    constructor(bookingService) {
-        this.bookingService = bookingService;
-    }
-    async createBooking(createBookingDto) {
-        return await this.bookingService.create(createBookingDto);
-    }
-    async getAllBookings() {
-        return await this.bookingService.findAll();
-    }
-};
-exports.BookingController = BookingController;
-__decorate([
-    (0, common_1.Post)(),
-    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, whitelist: true })),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof create_booking_dto_1.CreateBookingDto !== "undefined" && create_booking_dto_1.CreateBookingDto) === "function" ? _b : Object]),
-    __metadata("design:returntype", Promise)
-], BookingController.prototype, "createBooking", null);
-__decorate([
-    (0, common_1.Get)(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], BookingController.prototype, "getAllBookings", null);
-exports.BookingController = BookingController = __decorate([
-    (0, common_1.Controller)('bookings'),
-    __metadata("design:paramtypes", [typeof (_a = typeof booking_service_1.BookingService !== "undefined" && booking_service_1.BookingService) === "function" ? _a : Object])
-], BookingController);
-
-
-/***/ },
-
-/***/ "./src/booking/booking.module.ts"
-/*!***************************************!*\
-  !*** ./src/booking/booking.module.ts ***!
-  \***************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+/***/ }),
+/* 6 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -203,620 +86,40 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BookingModule = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const booking_controller_1 = __webpack_require__(/*! ./booking.controller */ "./src/booking/booking.controller.ts");
-const booking_service_1 = __webpack_require__(/*! ./booking.service */ "./src/booking/booking.service.ts");
-const prisma_module_1 = __webpack_require__(/*! @/prisma/prisma.module */ "./src/prisma/prisma.module.ts");
-const bull_1 = __webpack_require__(/*! @nestjs/bull */ "@nestjs/bull");
-let BookingModule = class BookingModule {
+exports.GmailModule = void 0;
+const common_1 = __webpack_require__(3);
+const gmail_controller_1 = __webpack_require__(7);
+const gmail_service_1 = __webpack_require__(8);
+const prisma_module_1 = __webpack_require__(13);
+const redis_module_1 = __webpack_require__(14);
+const bull_1 = __webpack_require__(12);
+const gmail_consumer_1 = __webpack_require__(18);
+const booking_module_1 = __webpack_require__(26);
+const cache_manager_1 = __webpack_require__(19);
+let GmailModule = class GmailModule {
 };
-exports.BookingModule = BookingModule;
-exports.BookingModule = BookingModule = __decorate([
+exports.GmailModule = GmailModule;
+exports.GmailModule = GmailModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            booking_module_1.BookingModule,
             prisma_module_1.PrismaModule,
+            redis_module_1.RedisModule,
+            cache_manager_1.CacheModule.register(),
             bull_1.BullModule.registerQueue({
-                name: 'booking-assignment-queue',
-            })
+                name: 'booking-processing-queue',
+            }),
         ],
-        controllers: [booking_controller_1.BookingController],
-        providers: [booking_service_1.BookingService],
-        exports: [booking_service_1.BookingService],
+        controllers: [gmail_controller_1.GmailController],
+        providers: [gmail_service_1.GmailService, gmail_consumer_1.GmailConsumer],
+        exports: [gmail_service_1.GmailService, gmail_consumer_1.GmailConsumer],
     })
-], BookingModule);
+], GmailModule);
 
 
-/***/ },
-
-/***/ "./src/booking/booking.service.ts"
-/*!****************************************!*\
-  !*** ./src/booking/booking.service.ts ***!
-  \****************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var _a;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BookingService = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const prisma_service_1 = __webpack_require__(/*! @/prisma/prisma.service */ "./src/prisma/prisma.service.ts");
-const bull_1 = __webpack_require__(/*! @nestjs/bull */ "@nestjs/bull");
-const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
-const crypto = __importStar(__webpack_require__(/*! crypto */ "crypto"));
-let BookingService = class BookingService {
-    prisma;
-    assignmentQueue;
-    constructor(prisma, assignmentQueue) {
-        this.prisma = prisma;
-        this.assignmentQueue = assignmentQueue;
-    }
-    async create(dto) {
-        try {
-            const uniqueSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
-            const fallbackRef = `REF-${Date.now()}-${uniqueSuffix}`;
-            const newBooking = await this.prisma.booking.create({
-                data: {
-                    bookingRef: dto.bookingRef?.trim() || fallbackRef,
-                    provider: dto.provider || 'manual-entry',
-                    status: dto.status,
-                    address: dto.address || null,
-                    latitude: dto.latitude ?? null,
-                    longitude: dto.longitude ?? null,
-                    startingDate: dto.startingDate ? new Date(dto.startingDate) : null,
-                    customerName: dto.customerName?.trim() || 'Unknown Customer',
-                    hotelName: dto.hotelName?.trim() || 'Unknown Hotel',
-                    phone: dto.phone || null,
-                    mail: dto.mail || null,
-                    totalPax: dto.totalPax || 0,
-                    paxDetail: dto.paxDetail,
-                    tourType: dto.tourType || null,
-                    tourName: dto.tourName || null,
-                    payment: dto.payment || null,
-                    rawDataId: dto.rawDataId ?? null,
-                },
-            });
-            try {
-                await this.assignmentQueue.add('auto-assign-operator-job', {
-                    bookingId: newBooking.id,
-                    bookingRef: newBooking.bookingRef,
-                    tourType: newBooking.tourType,
-                    latitude: newBooking.latitude,
-                    longitude: newBooking.longitude,
-                }, {
-                    attempts: 3,
-                    backoff: 5000,
-                    removeOnComplete: true,
-                    removeOnFail: false,
-                });
-            }
-            catch (queueError) {
-                console.error(`[Queue Emergency Log] Không thể đẩy job điều phối cho đơn ${newBooking.bookingRef}:`, queueError);
-            }
-            return newBooking;
-        }
-        catch (error) {
-            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
-                if (error.code === 'P2002') {
-                    throw new common_1.ConflictException(`Trùng lặp dữ liệu: Mã tham chiếu '${dto.bookingRef}' đã tồn tại trên hệ thống.`);
-                }
-                if (error.code === 'P2003') {
-                    throw new common_1.BadRequestException(`Liên kết dữ liệu thất bại: 'rawDataId' được cung cấp không tồn tại trong hệ thống.`);
-                }
-            }
-            throw new common_1.InternalServerErrorException('Đã xảy ra lỗi hệ thống trong quá trình xử lý đơn hàng.');
-        }
-    }
-    async findAll() {
-        try {
-            return await this.prisma.booking.findMany({
-                orderBy: {
-                    id: 'desc',
-                },
-            });
-        }
-        catch (error) {
-            console.error('[Prisma Error] Không thể truy vấn danh sách bookings:', error);
-            throw new common_1.InternalServerErrorException('Không thể tải danh sách đơn hàng từ máy chủ.');
-        }
-    }
-};
-exports.BookingService = BookingService;
-exports.BookingService = BookingService = __decorate([
-    (0, common_1.Injectable)(),
-    __param(1, (0, bull_1.InjectQueue)('booking-assignment-queue')),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, Object])
-], BookingService);
-
-
-/***/ },
-
-/***/ "./src/booking/dto/create-booking.dto.ts"
-/*!***********************************************!*\
-  !*** ./src/booking/dto/create-booking.dto.ts ***!
-  \***********************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var _a, _b, _c;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CreateBookingDto = void 0;
-const class_validator_1 = __webpack_require__(/*! class-validator */ "class-validator");
-const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
-class CreateBookingDto {
-    bookingRef;
-    provider;
-    status;
-    address;
-    latitude;
-    longitude;
-    startingDate;
-    customerName;
-    hotelName;
-    phone;
-    mail;
-    totalPax;
-    paxDetail;
-    tourType;
-    tourName;
-    payment;
-    rawDataId;
-}
-exports.CreateBookingDto = CreateBookingDto;
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], CreateBookingDto.prototype, "bookingRef", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "provider", void 0);
-__decorate([
-    (0, class_validator_1.IsEnum)(client_1.BookingStatus),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", typeof (_a = typeof client_1.BookingStatus !== "undefined" && client_1.BookingStatus) === "function" ? _a : Object)
-], CreateBookingDto.prototype, "status", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "address", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "latitude", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "longitude", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "startingDate", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], CreateBookingDto.prototype, "customerName", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", String)
-], CreateBookingDto.prototype, "hotelName", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "phone", void 0);
-__decorate([
-    (0, class_validator_1.IsEmail)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "mail", void 0);
-__decorate([
-    (0, class_validator_1.IsNumber)(),
-    (0, class_validator_1.Min)(0),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Number)
-], CreateBookingDto.prototype, "totalPax", void 0);
-__decorate([
-    (0, class_validator_1.IsObject)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "paxDetail", void 0);
-__decorate([
-    (0, class_validator_1.IsEnum)(client_1.TourType),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "tourType", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "tourName", void 0);
-__decorate([
-    (0, class_validator_1.IsEnum)(client_1.PaymentStatus),
-    (0, class_validator_1.IsOptional)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "payment", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", Object)
-], CreateBookingDto.prototype, "rawDataId", void 0);
-
-
-/***/ },
-
-/***/ "./src/data/data.controller.ts"
-/*!*************************************!*\
-  !*** ./src/data/data.controller.ts ***!
-  \*************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var _a;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DataController = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const data_service_1 = __webpack_require__(/*! @/data/data.service */ "./src/data/data.service.ts");
-let DataController = class DataController {
-    dataService;
-    constructor(dataService) {
-        this.dataService = dataService;
-    }
-    async importHotels() {
-        return this.dataService.importHotels();
-    }
-};
-exports.DataController = DataController;
-__decorate([
-    (0, common_1.Post)('import-hotels'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], DataController.prototype, "importHotels", null);
-exports.DataController = DataController = __decorate([
-    (0, common_1.Controller)('data'),
-    __metadata("design:paramtypes", [typeof (_a = typeof data_service_1.DataService !== "undefined" && data_service_1.DataService) === "function" ? _a : Object])
-], DataController);
-
-
-/***/ },
-
-/***/ "./src/data/data.module.ts"
-/*!*********************************!*\
-  !*** ./src/data/data.module.ts ***!
-  \*********************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DataModule = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const data_controller_1 = __webpack_require__(/*! ./data.controller */ "./src/data/data.controller.ts");
-const data_service_1 = __webpack_require__(/*! ./data.service */ "./src/data/data.service.ts");
-const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./src/prisma/prisma.service.ts");
-let DataModule = class DataModule {
-};
-exports.DataModule = DataModule;
-exports.DataModule = DataModule = __decorate([
-    (0, common_1.Module)({
-        controllers: [data_controller_1.DataController],
-        providers: [data_service_1.DataService, prisma_service_1.PrismaService],
-    })
-], DataModule);
-
-
-/***/ },
-
-/***/ "./src/data/data.service.ts"
-/*!**********************************!*\
-  !*** ./src/data/data.service.ts ***!
-  \**********************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-var _a;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DataService = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const prisma_service_1 = __webpack_require__(/*! ../prisma/prisma.service */ "./src/prisma/prisma.service.ts");
-const fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));
-const path_1 = __importDefault(__webpack_require__(/*! path */ "path"));
-const csv_parser_1 = __importDefault(__webpack_require__(/*! csv-parser */ "csv-parser"));
-let DataService = class DataService {
-    prisma;
-    constructor(prisma) {
-        this.prisma = prisma;
-    }
-    async importHotels() {
-        const hotels = [];
-        const csvPath = path_1.default.join(process.cwd(), 'src', 'data', 'hotelcoordinate.csv');
-        console.log('cwd:', process.cwd());
-        console.log('csvPath:', csvPath);
-        console.log('exists:', fs_1.default.existsSync(csvPath));
-        await new Promise((resolve, reject) => {
-            fs_1.default.createReadStream(csvPath)
-                .pipe((0, csv_parser_1.default)())
-                .on('data', (row) => {
-                hotels.push({
-                    hotelName: row.hotelName,
-                    starRating: row.starRating || null,
-                    address: row.address,
-                    coordinate: row.coordinate || null,
-                    latitude: Number(row.latitude),
-                    longitude: Number(row.longitude),
-                });
-            })
-                .on('end', () => resolve())
-                .on('error', reject);
-        });
-        const result = await this.prisma.coordinate.createMany({
-            data: hotels,
-            skipDuplicates: true,
-        });
-        return {
-            imported: result.count,
-            totalRows: hotels.length,
-        };
-    }
-};
-exports.DataService = DataService;
-exports.DataService = DataService = __decorate([
-    (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
-], DataService);
-
-
-/***/ },
-
-/***/ "./src/gmail/gmail.consumer.ts"
-/*!*************************************!*\
-  !*** ./src/gmail/gmail.consumer.ts ***!
-  \*************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var __param = (this && this.__param) || function (paramIndex, decorator) {
-    return function (target, key) { decorator(target, key, paramIndex); }
-};
-var GmailConsumer_1;
-var _a, _b;
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GmailConsumer = void 0;
-const bull_1 = __webpack_require__(/*! @nestjs/bull */ "@nestjs/bull");
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const prisma_service_1 = __webpack_require__(/*! @/prisma/prisma.service */ "./src/prisma/prisma.service.ts");
-const cache_manager_1 = __webpack_require__(/*! @nestjs/cache-manager */ "@nestjs/cache-manager");
-const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
-const gmail_parser_util_1 = __webpack_require__(/*! ./utils/gmail-parser.util */ "./src/gmail/utils/gmail-parser.util.ts");
-const booking_service_1 = __webpack_require__(/*! ../booking/booking.service */ "./src/booking/booking.service.ts");
-let GmailConsumer = GmailConsumer_1 = class GmailConsumer {
-    prisma;
-    bookingQueue;
-    cacheManager;
-    bookingService;
-    logger = new common_1.Logger(GmailConsumer_1.name);
-    constructor(prisma, bookingQueue, cacheManager, bookingService) {
-        this.prisma = prisma;
-        this.bookingQueue = bookingQueue;
-        this.cacheManager = cacheManager;
-        this.bookingService = bookingService;
-    }
-    async handleRawEmailJob(job) {
-        const { messageId, messageData } = job.data;
-        this.logger.log(`[STAGE 1 - RAW] Saving email snapshot for Message ID: ${messageId}`);
-        try {
-            const parsed = gmail_parser_util_1.GmailParserUtil.parseEmailBody(messageData);
-            const bookingData = parsed.bookingData;
-            if (!bookingData?.bookingRef) {
-                this.logger.warn(`[STAGE 1 ABORT] No unique booking reference could be resolved for message ${messageId}.`);
-                return;
-            }
-            const rawDataRecord = await this.prisma.rawData.upsert({
-                where: { sourceId: messageId },
-                update: {
-                    payload: parsed,
-                    status: 'PENDING',
-                },
-                create: {
-                    sourceId: messageId,
-                    payload: parsed,
-                    status: 'PENDING',
-                },
-            });
-            await this.bookingQueue.add('enrich-booking-job', {
-                rawId: rawDataRecord.id,
-                parsedPayload: parsed
-            }, {
-                attempts: 5,
-                backoff: 10000,
-            });
-            this.logger.log(`[STAGE 1 SUCCESS] RawData ${messageId} handled smoothly`);
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            this.logger.error(`[STAGE 1 CRITICAL ERROR] Failed to save raw data: ${errorMessage}`);
-            throw error;
-        }
-    }
-    async handleEnrichBookingJob(job) {
-        const { rawId, parsedPayload } = job.data;
-        this.logger.log(`[STAGE 2 - ENRICH] Processing booking enrichment for RawData ID: ${rawId}`);
-        try {
-            const bookingData = parsedPayload.bookingData;
-            console.log('Booking Data Extracted from Parsed Payload:', bookingData);
-            try {
-                await this.bookingService.create({
-                    bookingRef: bookingData?.bookingRef,
-                    provider: bookingData?.provider || 'UNKNOWN',
-                    status: client_1.BookingStatus.PENDING,
-                    address: bookingData?.pickUpAddress || null,
-                    latitude: null,
-                    longitude: null,
-                    startingDate: bookingData?.date || bookingData?.tripDate || null,
-                    customerName: bookingData?.customer || bookingData?.billingName || 'Unknown Customer',
-                    phone: bookingData?.customerPhone || bookingData?.billingCity || null,
-                    mail: bookingData?.customerEmail || bookingData?.billingEmail || null,
-                    totalPax: bookingData?.paxTotal || bookingData?.travellers || 0,
-                    paxDetail: bookingData?.pax || bookingData?.priceLines || null,
-                    hotelName: bookingData?.pickUp || 'Unknown Hotel' || 0,
-                    tourType: bookingData?.tourType ? bookingData.tourType : null,
-                    tourName: bookingData?.tourName || null,
-                    payment: client_1.PaymentStatus.PENDING,
-                    rawDataId: rawId || null,
-                });
-                this.logger.log(`[POSTGRES] Booking created successfully with full unified fields.`);
-            }
-            catch (dbError) {
-                if (dbError instanceof client_1.Prisma.PrismaClientKnownRequestError && dbError.code === 'P2002') {
-                    this.logger.warn(`[DUPLICATE BLOCKED] Booking already exists. Skipping insertion smoothly.`);
-                }
-                else {
-                    throw dbError;
-                }
-            }
-            await this.prisma.rawData.update({
-                where: { id: rawId },
-                data: { status: 'PROCESSED' }
-            });
-            this.logger.log(`[STAGE 2 SUCCESS] RawData ${rawId} status updated to PROCESSED.`);
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            this.logger.error(`[STAGE 2 FAILURE] Error enriching booking database: ${errorMessage}`);
-            await this.prisma.rawData.update({
-                where: { id: rawId },
-                data: { status: 'FAILED' }
-            });
-            throw error;
-        }
-    }
-};
-exports.GmailConsumer = GmailConsumer;
-__decorate([
-    (0, bull_1.Process)('process-raw-email-job'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], GmailConsumer.prototype, "handleRawEmailJob", null);
-__decorate([
-    (0, bull_1.Process)('enrich-booking-job'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], GmailConsumer.prototype, "handleEnrichBookingJob", null);
-exports.GmailConsumer = GmailConsumer = GmailConsumer_1 = __decorate([
-    (0, bull_1.Processor)('booking-processing-queue'),
-    __param(1, (0, bull_1.InjectQueue)('booking-processing-queue')),
-    __param(2, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, Object, Object, typeof (_b = typeof booking_service_1.BookingService !== "undefined" && booking_service_1.BookingService) === "function" ? _b : Object])
-], GmailConsumer);
-
-
-/***/ },
-
-/***/ "./src/gmail/gmail.controller.ts"
-/*!***************************************!*\
-  !*** ./src/gmail/gmail.controller.ts ***!
-  \***************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+/***/ }),
+/* 7 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -834,8 +137,8 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GmailController = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const gmail_service_1 = __webpack_require__(/*! @/gmail/gmail.service */ "./src/gmail/gmail.service.ts");
+const common_1 = __webpack_require__(3);
+const gmail_service_1 = __webpack_require__(8);
 let GmailController = class GmailController {
     gmailService;
     constructor(gmailService) {
@@ -889,60 +192,9 @@ exports.GmailController = GmailController = __decorate([
 ], GmailController);
 
 
-/***/ },
-
-/***/ "./src/gmail/gmail.module.ts"
-/*!***********************************!*\
-  !*** ./src/gmail/gmail.module.ts ***!
-  \***********************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GmailModule = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const gmail_controller_1 = __webpack_require__(/*! @/gmail/gmail.controller */ "./src/gmail/gmail.controller.ts");
-const gmail_service_1 = __webpack_require__(/*! @/gmail/gmail.service */ "./src/gmail/gmail.service.ts");
-const prisma_module_1 = __webpack_require__(/*! @/prisma/prisma.module */ "./src/prisma/prisma.module.ts");
-const redis_module_1 = __webpack_require__(/*! @/redis/redis.module */ "./src/redis/redis.module.ts");
-const bull_1 = __webpack_require__(/*! @nestjs/bull */ "@nestjs/bull");
-const gmail_consumer_1 = __webpack_require__(/*! @/gmail/gmail.consumer */ "./src/gmail/gmail.consumer.ts");
-const booking_module_1 = __webpack_require__(/*! @/booking/booking.module */ "./src/booking/booking.module.ts");
-const cache_manager_1 = __webpack_require__(/*! @nestjs/cache-manager */ "@nestjs/cache-manager");
-let GmailModule = class GmailModule {
-};
-exports.GmailModule = GmailModule;
-exports.GmailModule = GmailModule = __decorate([
-    (0, common_1.Module)({
-        imports: [
-            booking_module_1.BookingModule,
-            prisma_module_1.PrismaModule,
-            redis_module_1.RedisModule,
-            cache_manager_1.CacheModule.register(),
-            bull_1.BullModule.registerQueue({
-                name: 'booking-processing-queue',
-            }),
-        ],
-        controllers: [gmail_controller_1.GmailController],
-        providers: [gmail_service_1.GmailService, gmail_consumer_1.GmailConsumer],
-        exports: [gmail_service_1.GmailService, gmail_consumer_1.GmailConsumer],
-    })
-], GmailModule);
-
-
-/***/ },
-
-/***/ "./src/gmail/gmail.service.ts"
-/*!************************************!*\
-  !*** ./src/gmail/gmail.service.ts ***!
-  \************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+/***/ }),
+/* 8 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -961,10 +213,10 @@ var GmailService_1;
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GmailService = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const googleapis_1 = __webpack_require__(/*! googleapis */ "googleapis");
-const prisma_service_1 = __webpack_require__(/*! @/prisma/prisma.service */ "./src/prisma/prisma.service.ts");
-const bull_1 = __webpack_require__(/*! @nestjs/bull */ "@nestjs/bull");
+const common_1 = __webpack_require__(3);
+const googleapis_1 = __webpack_require__(9);
+const prisma_service_1 = __webpack_require__(10);
+const bull_1 = __webpack_require__(12);
 let GmailService = GmailService_1 = class GmailService {
     prisma;
     bookingQueue;
@@ -1098,13 +350,500 @@ exports.GmailService = GmailService = GmailService_1 = __decorate([
 ], GmailService);
 
 
-/***/ },
+/***/ }),
+/* 9 */
+/***/ ((module) => {
 
-/***/ "./src/gmail/parsers/tripadvisorHtmlParser.ts"
-/*!****************************************************!*\
-  !*** ./src/gmail/parsers/tripadvisorHtmlParser.ts ***!
-  \****************************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+module.exports = require("googleapis");
+
+/***/ }),
+/* 10 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PrismaService = void 0;
+const common_1 = __webpack_require__(3);
+const client_1 = __webpack_require__(11);
+let PrismaService = class PrismaService extends client_1.PrismaClient {
+    async onModuleInit() {
+        await this.$connect();
+        console.log('Prisma connected');
+    }
+    async enableShutdownHooks(app) {
+        process.on('beforeExit', async () => {
+            await app.close();
+        });
+    }
+};
+exports.PrismaService = PrismaService;
+exports.PrismaService = PrismaService = __decorate([
+    (0, common_1.Injectable)()
+], PrismaService);
+
+
+/***/ }),
+/* 11 */
+/***/ ((module) => {
+
+module.exports = require("@prisma/client");
+
+/***/ }),
+/* 12 */
+/***/ ((module) => {
+
+module.exports = require("@nestjs/bull");
+
+/***/ }),
+/* 13 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PrismaModule = void 0;
+const common_1 = __webpack_require__(3);
+const prisma_service_1 = __webpack_require__(10);
+let PrismaModule = class PrismaModule {
+};
+exports.PrismaModule = PrismaModule;
+exports.PrismaModule = PrismaModule = __decorate([
+    (0, common_1.Global)(),
+    (0, common_1.Module)({
+        providers: [prisma_service_1.PrismaService],
+        exports: [prisma_service_1.PrismaService],
+    })
+], PrismaModule);
+
+
+/***/ }),
+/* 14 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RedisModule = void 0;
+const common_1 = __webpack_require__(3);
+const redis_provider_1 = __webpack_require__(15);
+const redis_service_1 = __webpack_require__(17);
+let RedisModule = class RedisModule {
+};
+exports.RedisModule = RedisModule;
+exports.RedisModule = RedisModule = __decorate([
+    (0, common_1.Global)(),
+    (0, common_1.Module)({
+        providers: [redis_provider_1.RedisProvider, redis_service_1.RedisService],
+        exports: [redis_service_1.RedisService],
+    })
+], RedisModule);
+
+
+/***/ }),
+/* 15 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RedisProvider = void 0;
+const ioredis_1 = __importDefault(__webpack_require__(16));
+exports.RedisProvider = {
+    provide: 'REDIS_CLIENT',
+    useFactory: () => {
+        const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+        console.log('Creating Redis client');
+        const client = new ioredis_1.default(redisUrl);
+        client.on('connect', () => {
+            console.log('🚀 [Redis] Connected successfully to cache cluster!');
+        });
+        client.on('error', (err) => {
+            console.error('❌ [Redis] Connection error:', err);
+        });
+        return client;
+    },
+};
+
+
+/***/ }),
+/* 16 */
+/***/ ((module) => {
+
+module.exports = require("ioredis");
+
+/***/ }),
+/* 17 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.RedisService = void 0;
+const common_1 = __webpack_require__(3);
+let RedisService = class RedisService {
+    redis;
+    constructor(redis) {
+        this.redis = redis;
+    }
+    getBookingKey(provider, bookingRef) {
+        return `parsedmail:booking:${provider.toLowerCase()}:${bookingRef.toLowerCase()}`;
+    }
+    async cacheParsedMail(key, data, ttlSeconds = 86400) {
+        await this.redis.set(key, JSON.stringify(data), 'EX', ttlSeconds);
+    }
+    async pushToRawQueue(data) {
+        const queueKey = 'parsedmail:queue:raw-postgres';
+        return this.redis.rpush(queueKey, JSON.stringify(data));
+    }
+    async popFromRawQueue() {
+        const queueKey = 'parsedmail:queue:raw-postgres';
+        const rawData = await this.redis.lpop(queueKey);
+        if (!rawData)
+            return null;
+        return JSON.parse(rawData);
+    }
+    async getRawQueueLength() {
+        const queueKey = 'parsedmail:queue:raw-postgres';
+        return this.redis.llen(queueKey);
+    }
+    getGeoCacheKey(sanitizedAddress) {
+        return `geo:cache:${sanitizedAddress.trim().toLowerCase()}`;
+    }
+    async cacheCoordinates(key, coordinates, ttlSeconds = 2592000) {
+        await this.redis.set(key, JSON.stringify(coordinates), 'EX', ttlSeconds);
+    }
+    async incr(key) {
+        return this.redis.incr(key);
+    }
+    async set(key, value, ttlSeconds) {
+        await this.redis.set(key, value, 'EX', ttlSeconds);
+    }
+    async get(key) {
+        return this.redis.get(key);
+    }
+    async delete(key) {
+        return this.redis.del(key);
+    }
+};
+exports.RedisService = RedisService;
+exports.RedisService = RedisService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(0, (0, common_1.Inject)('REDIS_CLIENT')),
+    __metadata("design:paramtypes", [Object])
+], RedisService);
+
+
+/***/ }),
+/* 18 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var GmailConsumer_1;
+var _a, _b;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GmailConsumer = void 0;
+const bull_1 = __webpack_require__(12);
+const common_1 = __webpack_require__(3);
+const prisma_service_1 = __webpack_require__(10);
+const cache_manager_1 = __webpack_require__(19);
+const client_1 = __webpack_require__(11);
+const gmail_parser_util_1 = __webpack_require__(20);
+const booking_service_1 = __webpack_require__(24);
+let GmailConsumer = GmailConsumer_1 = class GmailConsumer {
+    prisma;
+    bookingQueue;
+    cacheManager;
+    bookingService;
+    logger = new common_1.Logger(GmailConsumer_1.name);
+    constructor(prisma, bookingQueue, cacheManager, bookingService) {
+        this.prisma = prisma;
+        this.bookingQueue = bookingQueue;
+        this.cacheManager = cacheManager;
+        this.bookingService = bookingService;
+    }
+    async handleRawEmailJob(job) {
+        const { messageId, messageData } = job.data;
+        this.logger.log(`[STAGE 1 - RAW] Saving email snapshot for Message ID: ${messageId}`);
+        try {
+            const parsed = gmail_parser_util_1.GmailParserUtil.parseEmailBody(messageData);
+            const bookingData = parsed.bookingData;
+            if (!bookingData?.bookingRef) {
+                this.logger.warn(`[STAGE 1 ABORT] No unique booking reference could be resolved for message ${messageId}.`);
+                return;
+            }
+            const rawDataRecord = await this.prisma.rawData.upsert({
+                where: { sourceId: messageId },
+                update: {
+                    payload: parsed,
+                    status: 'PENDING',
+                },
+                create: {
+                    sourceId: messageId,
+                    payload: parsed,
+                    status: 'PENDING',
+                },
+            });
+            await this.bookingQueue.add('enrich-booking-job', {
+                rawId: rawDataRecord.id,
+                parsedPayload: parsed
+            }, {
+                attempts: 5,
+                backoff: 10000,
+            });
+            this.logger.log(`[STAGE 1 SUCCESS] RawData ${messageId} handled smoothly`);
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.logger.error(`[STAGE 1 CRITICAL ERROR] Failed to save raw data: ${errorMessage}`);
+            throw error;
+        }
+    }
+    async handleEnrichBookingJob(job) {
+        const { rawId, parsedPayload } = job.data;
+        this.logger.log(`[STAGE 2 - ENRICH] Processing booking enrichment for RawData ID: ${rawId}`);
+        try {
+            const bookingData = parsedPayload.bookingData;
+            console.log('Booking Data Extracted from Parsed Payload:', bookingData);
+            try {
+                await this.bookingService.create({
+                    bookingRef: bookingData?.bookingRef,
+                    provider: bookingData?.provider || 'UNKNOWN',
+                    status: client_1.BookingStatus.PENDING,
+                    address: bookingData?.pickUpAddress || null,
+                    latitude: null,
+                    longitude: null,
+                    startingDate: bookingData?.date || bookingData?.tripDate || null,
+                    customerName: bookingData?.customer || bookingData?.billingName || 'Unknown Customer',
+                    phone: bookingData?.customerPhone || bookingData?.billingCity || null,
+                    mail: bookingData?.customerEmail || bookingData?.billingEmail || null,
+                    totalPax: bookingData?.paxTotal || bookingData?.travellers || 0,
+                    paxDetail: bookingData?.pax || bookingData?.priceLines || null,
+                    hotelName: bookingData?.pickUp || 'Unknown Hotel' || 0,
+                    tourType: bookingData?.tourType ? bookingData.tourType : null,
+                    tourName: bookingData?.tourName || null,
+                    payment: client_1.PaymentStatus.PENDING,
+                    rawDataId: rawId || null,
+                });
+                this.logger.log(`[POSTGRES] Booking created successfully with full unified fields.`);
+            }
+            catch (dbError) {
+                if (dbError instanceof client_1.Prisma.PrismaClientKnownRequestError && dbError.code === 'P2002') {
+                    this.logger.warn(`[DUPLICATE BLOCKED] Booking already exists. Skipping insertion smoothly.`);
+                }
+                else {
+                    throw dbError;
+                }
+            }
+            await this.prisma.rawData.update({
+                where: { id: rawId },
+                data: { status: 'PROCESSED' }
+            });
+            this.logger.log(`[STAGE 2 SUCCESS] RawData ${rawId} status updated to PROCESSED.`);
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.logger.error(`[STAGE 2 FAILURE] Error enriching booking database: ${errorMessage}`);
+            await this.prisma.rawData.update({
+                where: { id: rawId },
+                data: { status: 'FAILED' }
+            });
+            throw error;
+        }
+    }
+};
+exports.GmailConsumer = GmailConsumer;
+__decorate([
+    (0, bull_1.Process)('process-raw-email-job'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], GmailConsumer.prototype, "handleRawEmailJob", null);
+__decorate([
+    (0, bull_1.Process)('enrich-booking-job'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], GmailConsumer.prototype, "handleEnrichBookingJob", null);
+exports.GmailConsumer = GmailConsumer = GmailConsumer_1 = __decorate([
+    (0, bull_1.Processor)('booking-processing-queue'),
+    __param(1, (0, bull_1.InjectQueue)('booking-processing-queue')),
+    __param(2, (0, common_1.Inject)(cache_manager_1.CACHE_MANAGER)),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, Object, Object, typeof (_b = typeof booking_service_1.BookingService !== "undefined" && booking_service_1.BookingService) === "function" ? _b : Object])
+], GmailConsumer);
+
+
+/***/ }),
+/* 19 */
+/***/ ((module) => {
+
+module.exports = require("@nestjs/cache-manager");
+
+/***/ }),
+/* 20 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GmailParserUtil = void 0;
+const cheerio = __importStar(__webpack_require__(21));
+const tripadvisorHtmlParser_1 = __webpack_require__(22);
+const websiteHtmlParser_1 = __webpack_require__(23);
+class GmailParserUtil {
+    static decodeBase64Url(data) {
+        const base64 = data.replace(/-/g, '+').replace(/_/g, '/');
+        return Buffer.from(base64, 'base64').toString('utf-8');
+    }
+    static extractParts(payload, parts = []) {
+        if (!payload)
+            return parts;
+        if (payload.body?.data)
+            parts.push({ mimeType: payload.mimeType, data: payload.body.data });
+        if (payload.parts?.length) {
+            for (const part of payload.parts)
+                this.extractParts(part, parts);
+        }
+        return parts;
+    }
+    static stripHtml(html) {
+        const $ = cheerio.load(html);
+        $('style, script, head, img, link, meta, noscript').remove();
+        return $.text().replace(/\s{2,}/g, ' ').trim();
+    }
+    static detectProvider(headers) {
+        const senderFields = [
+            headers['from'] ?? '', headers['reply-to'] ?? '', headers['sender'] ?? '', headers['return-path'] ?? ''
+        ].join(' ').toLowerCase();
+        if (senderFields.includes('nquocnhu95tourguide@gmail.com'))
+            return 'tripadvisor';
+        if (senderFields.includes('nquocnhu95book@gmail.com'))
+            return 'website';
+        return 'unknown';
+    }
+    static parseBookingData(provider, htmlBody) {
+        if (!htmlBody)
+            return null;
+        switch (provider) {
+            case 'tripadvisor': return tripadvisorHtmlParser_1.TripAdvisorHtmlParser.parse(htmlBody);
+            case 'website': return websiteHtmlParser_1.WebsiteHtmlParser.parse(htmlBody);
+            default: return null;
+        }
+    }
+    static parseEmailBody(messageData) {
+        const allParts = this.extractParts(messageData.payload);
+        const plainPart = allParts.find((p) => p.mimeType === 'text/plain');
+        const htmlPart = allParts.find((p) => p.mimeType === 'text/html');
+        const textBody = plainPart ? this.decodeBase64Url(plainPart.data) : null;
+        const htmlBody = htmlPart ? this.decodeBase64Url(htmlPart.data) : null;
+        const cleanBody = textBody ?? (htmlBody ? this.stripHtml(htmlBody) : null);
+        const headers = {};
+        for (const h of messageData.payload?.headers ?? []) {
+            headers[h.name.toLowerCase()] = h.value;
+        }
+        const subject = headers['subject'] ?? '';
+        const lowerSubject = subject.toLowerCase();
+        const status = lowerSubject.includes('cancel') || lowerSubject.includes('cancellation') || lowerSubject.includes('cancelled')
+            ? 'CANCEL' : 'NEW_BOOKING';
+        const provider = this.detectProvider(headers);
+        const bookingData = this.parseBookingData(provider, htmlBody);
+        return {
+            bookingStatus: status,
+            subject: headers['subject'] ?? null,
+            from: headers['from'] ?? null,
+            to: headers['to'] ?? null,
+            date: headers['date'] ?? null,
+            messageId: headers['message-id'] ?? null,
+            snippet: messageData.snippet ?? null,
+            internalDate: messageData.internalDate ?? null,
+            textBody, htmlBody, cleanBody, provider, bookingData,
+        };
+    }
+}
+exports.GmailParserUtil = GmailParserUtil;
+
+
+/***/ }),
+/* 21 */
+/***/ ((module) => {
+
+module.exports = require("cheerio");
+
+/***/ }),
+/* 22 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -1142,7 +881,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TripAdvisorHtmlParser = void 0;
-const cheerio = __importStar(__webpack_require__(/*! cheerio */ "cheerio"));
+const cheerio = __importStar(__webpack_require__(21));
 class TripAdvisorHtmlParser {
     static parse(htmlBody) {
         if (!htmlBody || htmlBody.trim() === '') {
@@ -1336,13 +1075,9 @@ class TripAdvisorHtmlParser {
 exports.TripAdvisorHtmlParser = TripAdvisorHtmlParser;
 
 
-/***/ },
-
-/***/ "./src/gmail/parsers/websiteHtmlParser.ts"
-/*!************************************************!*\
-  !*** ./src/gmail/parsers/websiteHtmlParser.ts ***!
-  \************************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+/***/ }),
+/* 23 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -1380,7 +1115,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.WebsiteHtmlParser = void 0;
-const cheerio = __importStar(__webpack_require__(/*! cheerio */ "cheerio"));
+const cheerio = __importStar(__webpack_require__(21));
 class WebsiteHtmlParser {
     static parse(htmlBody) {
         if (!htmlBody) {
@@ -1537,13 +1272,9 @@ class WebsiteHtmlParser {
 exports.WebsiteHtmlParser = WebsiteHtmlParser;
 
 
-/***/ },
-
-/***/ "./src/gmail/utils/gmail-parser.util.ts"
-/*!**********************************************!*\
-  !*** ./src/gmail/utils/gmail-parser.util.ts ***!
-  \**********************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+/***/ }),
+/* 24 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
@@ -1562,6 +1293,12 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
 var __importStar = (this && this.__importStar) || (function () {
     var ownKeys = function(o) {
         ownKeys = Object.getOwnPropertyNames || function (o) {
@@ -1579,91 +1316,208 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.GmailParserUtil = void 0;
-const cheerio = __importStar(__webpack_require__(/*! cheerio */ "cheerio"));
-const tripadvisorHtmlParser_1 = __webpack_require__(/*! ../parsers/tripadvisorHtmlParser */ "./src/gmail/parsers/tripadvisorHtmlParser.ts");
-const websiteHtmlParser_1 = __webpack_require__(/*! ../parsers/websiteHtmlParser */ "./src/gmail/parsers/websiteHtmlParser.ts");
-class GmailParserUtil {
-    static decodeBase64Url(data) {
-        const base64 = data.replace(/-/g, '+').replace(/_/g, '/');
-        return Buffer.from(base64, 'base64').toString('utf-8');
+exports.BookingService = void 0;
+const common_1 = __webpack_require__(3);
+const prisma_service_1 = __webpack_require__(10);
+const bull_1 = __webpack_require__(12);
+const client_1 = __webpack_require__(11);
+const crypto = __importStar(__webpack_require__(25));
+let BookingService = class BookingService {
+    prisma;
+    assignmentQueue;
+    constructor(prisma, assignmentQueue) {
+        this.prisma = prisma;
+        this.assignmentQueue = assignmentQueue;
     }
-    static extractParts(payload, parts = []) {
-        if (!payload)
-            return parts;
-        if (payload.body?.data)
-            parts.push({ mimeType: payload.mimeType, data: payload.body.data });
-        if (payload.parts?.length) {
-            for (const part of payload.parts)
-                this.extractParts(part, parts);
+    async create(dto) {
+        try {
+            const uniqueSuffix = crypto.randomBytes(3).toString('hex').toUpperCase();
+            const fallbackRef = `REF-${Date.now()}-${uniqueSuffix}`;
+            const newBooking = await this.prisma.booking.create({
+                data: {
+                    bookingRef: dto.bookingRef?.trim() || fallbackRef,
+                    provider: dto.provider || 'manual-entry',
+                    status: dto.status || client_1.BookingStatus.PENDING,
+                    address: dto.address || null,
+                    latitude: dto.latitude ?? null,
+                    longitude: dto.longitude ?? null,
+                    startingDate: dto.startingDate ? new Date(dto.startingDate) : null,
+                    customerName: dto.customerName?.trim() || 'Unknown Customer',
+                    hotelName: dto.hotelName?.trim() || 'Unknown Hotel',
+                    phone: dto.phone || null,
+                    mail: dto.mail || null,
+                    totalPax: dto.totalPax || 0,
+                    paxDetail: dto.paxDetail || null,
+                    tourType: dto.tourType || null,
+                    tourName: dto.tourName || null,
+                    payment: dto.payment || 'PENDING',
+                    rawDataId: dto.rawDataId ?? null,
+                    vehicleId: null,
+                    lanePosition: null,
+                },
+            });
+            try {
+                await this.assignmentQueue.add('manual-assign-operator-job', {
+                    bookingId: newBooking.id,
+                    bookingRef: newBooking.bookingRef,
+                    tourType: newBooking.tourType,
+                    tourName: newBooking.tourName,
+                    startingDate: newBooking.startingDate,
+                }, {
+                    attempts: 3,
+                    backoff: 5000,
+                    removeOnComplete: true,
+                    removeOnFail: false,
+                });
+            }
+            catch (queueError) {
+                console.error(`[Queue Warning] Auto-grouping assignment bypass for ${newBooking.bookingRef}:`, queueError);
+            }
+            return newBooking;
         }
-        return parts;
-    }
-    static stripHtml(html) {
-        const $ = cheerio.load(html);
-        $('style, script, head, img, link, meta, noscript').remove();
-        return $.text().replace(/\s{2,}/g, ' ').trim();
-    }
-    static detectProvider(headers) {
-        const senderFields = [
-            headers['from'] ?? '', headers['reply-to'] ?? '', headers['sender'] ?? '', headers['return-path'] ?? ''
-        ].join(' ').toLowerCase();
-        if (senderFields.includes('nquocnhu95tourguide@gmail.com'))
-            return 'tripadvisor';
-        if (senderFields.includes('nquocnhu95book@gmail.com'))
-            return 'website';
-        return 'unknown';
-    }
-    static parseBookingData(provider, htmlBody) {
-        if (!htmlBody)
-            return null;
-        switch (provider) {
-            case 'tripadvisor': return tripadvisorHtmlParser_1.TripAdvisorHtmlParser.parse(htmlBody);
-            case 'website': return websiteHtmlParser_1.WebsiteHtmlParser.parse(htmlBody);
-            default: return null;
+        catch (error) {
+            if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
+                if (error.code === 'P2002')
+                    throw new common_1.ConflictException(`Data collision: Code '${dto.bookingRef}' exists.`);
+                if (error.code === 'P2003')
+                    throw new common_1.BadRequestException(`Foreign key mismatch: 'rawDataId' is invalid.`);
+            }
+            throw new common_1.InternalServerErrorException('System error encountered while processing raw booking data.');
         }
     }
-    static parseEmailBody(messageData) {
-        const allParts = this.extractParts(messageData.payload);
-        const plainPart = allParts.find((p) => p.mimeType === 'text/plain');
-        const htmlPart = allParts.find((p) => p.mimeType === 'text/html');
-        const textBody = plainPart ? this.decodeBase64Url(plainPart.data) : null;
-        const htmlBody = htmlPart ? this.decodeBase64Url(htmlPart.data) : null;
-        const cleanBody = textBody ?? (htmlBody ? this.stripHtml(htmlBody) : null);
-        const headers = {};
-        for (const h of messageData.payload?.headers ?? []) {
-            headers[h.name.toLowerCase()] = h.value;
+    async cancelBooking(bookingRef) {
+        try {
+            return await this.prisma.$transaction(async (tx) => {
+                const target = await tx.booking.findUnique({
+                    where: { bookingRef: bookingRef },
+                    include: { assignment: true }
+                });
+                if (!target) {
+                    throw new common_1.NotFoundException(`Requested operational record '${bookingRef}' not found.`);
+                }
+                if (target.vehicleId && target.assignment) {
+                    const currentSequenceIndex = target.assignment.sequenceIndex;
+                    const assignedVehicleId = target.vehicleId;
+                    await tx.assignment.delete({
+                        where: { bookingId: target.id }
+                    });
+                    await tx.assignment.updateMany({
+                        where: {
+                            vehicleId: assignedVehicleId,
+                            sequenceIndex: { gt: currentSequenceIndex }
+                        },
+                        data: { sequenceIndex: { decrement: 1 } }
+                    });
+                }
+                return await tx.booking.update({
+                    where: { bookingRef: bookingRef },
+                    data: {
+                        status: client_1.BookingStatus.CANCELED,
+                        vehicleId: null,
+                        lanePosition: null
+                    }
+                });
+            });
         }
-        const subject = headers['subject'] ?? '';
-        const lowerSubject = subject.toLowerCase();
-        const status = lowerSubject.includes('cancel') || lowerSubject.includes('cancellation') || lowerSubject.includes('cancelled')
-            ? 'CANCEL' : 'NEW_BOOKING';
-        const provider = this.detectProvider(headers);
-        const bookingData = this.parseBookingData(provider, htmlBody);
-        return {
-            bookingStatus: status,
-            subject: headers['subject'] ?? null,
-            from: headers['from'] ?? null,
-            to: headers['to'] ?? null,
-            date: headers['date'] ?? null,
-            messageId: headers['message-id'] ?? null,
-            snippet: messageData.snippet ?? null,
-            internalDate: messageData.internalDate ?? null,
-            textBody, htmlBody, cleanBody, provider, bookingData,
-        };
+        catch (error) {
+            if (error instanceof common_1.NotFoundException)
+                throw error;
+            console.error('[Dispatcher Error] Safe cancellation sequence interrupted:', error);
+            throw new common_1.InternalServerErrorException('Dispatcher failed to safely clear lane structure during cancellation.');
+        }
     }
-}
-exports.GmailParserUtil = GmailParserUtil;
+    async findAll() {
+        try {
+            return await this.prisma.booking.findMany({
+                include: {
+                    assignment: true
+                },
+                orderBy: [
+                    { startingDate: 'asc' },
+                    { tourName: 'asc' }
+                ]
+            });
+        }
+        catch (error) {
+            console.error('[Prisma Error] Failed to fetch active dispatch map:', error);
+            throw new common_1.InternalServerErrorException('Could not retrieve booking configurations.');
+        }
+    }
+    async updateDroppedSequence(bookingId, targetVehicleId, newSequenceIndex) {
+        try {
+            return await this.prisma.$transaction(async (tx) => {
+                const currentAssignment = await tx.assignment.findUnique({
+                    where: { bookingId }
+                });
+                if (!currentAssignment) {
+                    await tx.assignment.create({
+                        data: { bookingId, vehicleId: targetVehicleId || 'UNASSIGNED', sequenceIndex: newSequenceIndex }
+                    });
+                }
+                else {
+                    await tx.assignment.delete({ where: { bookingId } });
+                    await tx.assignment.updateMany({
+                        where: {
+                            vehicleId: currentAssignment.vehicleId,
+                            sequenceIndex: { gt: currentAssignment.sequenceIndex }
+                        },
+                        data: { sequenceIndex: { decrement: 1 } }
+                    });
+                }
+                if (targetVehicleId) {
+                    await tx.assignment.updateMany({
+                        where: {
+                            vehicleId: targetVehicleId,
+                            sequenceIndex: { gte: newSequenceIndex }
+                        },
+                        data: { sequenceIndex: { increment: 1 } }
+                    });
+                    await tx.assignment.upsert({
+                        where: { bookingId },
+                        create: { bookingId, vehicleId: targetVehicleId, sequenceIndex: newSequenceIndex },
+                        update: { vehicleId: targetVehicleId, sequenceIndex: newSequenceIndex }
+                    });
+                }
+                return await tx.booking.update({
+                    where: { id: bookingId },
+                    data: {
+                        vehicleId: targetVehicleId,
+                        status: targetVehicleId ? 'ASSIGNED' : 'PENDING'
+                    }
+                });
+            });
+        }
+        catch (error) {
+            console.error('[Dispatcher Drag Error] Failed to persist layout shift:', error);
+            throw new common_1.InternalServerErrorException('Database failed to re-index lanes during layout shift.');
+        }
+    }
+};
+exports.BookingService = BookingService;
+exports.BookingService = BookingService = __decorate([
+    (0, common_1.Injectable)(),
+    __param(1, (0, bull_1.InjectQueue)('booking-assignment-queue')),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, Object])
+], BookingService);
 
 
-/***/ },
+/***/ }),
+/* 25 */
+/***/ ((module) => {
 
-/***/ "./src/prisma/prisma.module.ts"
-/*!*************************************!*\
-  !*** ./src/prisma/prisma.module.ts ***!
-  \*************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+module.exports = require("crypto");
+
+/***/ }),
+/* 26 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -1673,128 +1527,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PrismaModule = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const prisma_service_1 = __webpack_require__(/*! @/prisma/prisma.service */ "./src/prisma/prisma.service.ts");
-let PrismaModule = class PrismaModule {
+exports.BookingModule = void 0;
+const common_1 = __webpack_require__(3);
+const booking_controller_1 = __webpack_require__(27);
+const booking_service_1 = __webpack_require__(24);
+const prisma_module_1 = __webpack_require__(13);
+const bull_1 = __webpack_require__(12);
+let BookingModule = class BookingModule {
 };
-exports.PrismaModule = PrismaModule;
-exports.PrismaModule = PrismaModule = __decorate([
-    (0, common_1.Global)(),
+exports.BookingModule = BookingModule;
+exports.BookingModule = BookingModule = __decorate([
     (0, common_1.Module)({
-        providers: [prisma_service_1.PrismaService],
-        exports: [prisma_service_1.PrismaService],
+        imports: [
+            prisma_module_1.PrismaModule,
+            bull_1.BullModule.registerQueue({
+                name: 'booking-assignment-queue',
+            })
+        ],
+        controllers: [booking_controller_1.BookingController],
+        providers: [booking_service_1.BookingService],
+        exports: [booking_service_1.BookingService],
     })
-], PrismaModule);
+], BookingModule);
 
 
-/***/ },
-
-/***/ "./src/prisma/prisma.service.ts"
-/*!**************************************!*\
-  !*** ./src/prisma/prisma.service.ts ***!
-  \**************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.PrismaService = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
-let PrismaService = class PrismaService extends client_1.PrismaClient {
-    async onModuleInit() {
-        await this.$connect();
-        console.log('Prisma connected');
-    }
-    async enableShutdownHooks(app) {
-        process.on('beforeExit', async () => {
-            await app.close();
-        });
-    }
-};
-exports.PrismaService = PrismaService;
-exports.PrismaService = PrismaService = __decorate([
-    (0, common_1.Injectable)()
-], PrismaService);
-
-
-/***/ },
-
-/***/ "./src/redis/redis.module.ts"
-/*!***********************************!*\
-  !*** ./src/redis/redis.module.ts ***!
-  \***********************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RedisModule = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const redis_provider_1 = __webpack_require__(/*! @/redis/redis.provider */ "./src/redis/redis.provider.ts");
-const redis_service_1 = __webpack_require__(/*! @/redis/redis.service */ "./src/redis/redis.service.ts");
-let RedisModule = class RedisModule {
-};
-exports.RedisModule = RedisModule;
-exports.RedisModule = RedisModule = __decorate([
-    (0, common_1.Global)(),
-    (0, common_1.Module)({
-        providers: [redis_provider_1.RedisProvider, redis_service_1.RedisService],
-        exports: [redis_service_1.RedisService],
-    })
-], RedisModule);
-
-
-/***/ },
-
-/***/ "./src/redis/redis.provider.ts"
-/*!*************************************!*\
-  !*** ./src/redis/redis.provider.ts ***!
-  \*************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
-
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RedisProvider = void 0;
-const ioredis_1 = __importDefault(__webpack_require__(/*! ioredis */ "ioredis"));
-exports.RedisProvider = {
-    provide: 'REDIS_CLIENT',
-    useFactory: () => {
-        const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-        console.log('Creating Redis client');
-        const client = new ioredis_1.default(redisUrl);
-        client.on('connect', () => {
-            console.log('🚀 [Redis] Connected successfully to cache cluster!');
-        });
-        client.on('error', (err) => {
-            console.error('❌ [Redis] Connection error:', err);
-        });
-        return client;
-    },
-};
-
-
-/***/ },
-
-/***/ "./src/redis/redis.service.ts"
-/*!************************************!*\
-  !*** ./src/redis/redis.service.ts ***!
-  \************************************/
-(__unused_webpack_module, exports, __webpack_require__) {
+/***/ }),
+/* 27 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -1809,215 +1568,402 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var _a, _b;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RedisService = void 0;
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-let RedisService = class RedisService {
-    redis;
-    constructor(redis) {
-        this.redis = redis;
+exports.BookingController = void 0;
+const common_1 = __webpack_require__(3);
+const booking_service_1 = __webpack_require__(24);
+const create_booking_dto_1 = __webpack_require__(28);
+let BookingController = class BookingController {
+    bookingService;
+    constructor(bookingService) {
+        this.bookingService = bookingService;
     }
-    getBookingKey(provider, bookingRef) {
-        return `parsedmail:booking:${provider.toLowerCase()}:${bookingRef.toLowerCase()}`;
+    async createBooking(createBookingDto) {
+        return await this.bookingService.create(createBookingDto);
     }
-    async cacheParsedMail(key, data, ttlSeconds = 86400) {
-        await this.redis.set(key, JSON.stringify(data), 'EX', ttlSeconds);
-    }
-    async pushToRawQueue(data) {
-        const queueKey = 'parsedmail:queue:raw-postgres';
-        return this.redis.rpush(queueKey, JSON.stringify(data));
-    }
-    async popFromRawQueue() {
-        const queueKey = 'parsedmail:queue:raw-postgres';
-        const rawData = await this.redis.lpop(queueKey);
-        if (!rawData)
-            return null;
-        return JSON.parse(rawData);
-    }
-    async getRawQueueLength() {
-        const queueKey = 'parsedmail:queue:raw-postgres';
-        return this.redis.llen(queueKey);
-    }
-    getGeoCacheKey(sanitizedAddress) {
-        return `geo:cache:${sanitizedAddress.trim().toLowerCase()}`;
-    }
-    async cacheCoordinates(key, coordinates, ttlSeconds = 2592000) {
-        await this.redis.set(key, JSON.stringify(coordinates), 'EX', ttlSeconds);
-    }
-    async incr(key) {
-        return this.redis.incr(key);
-    }
-    async set(key, value, ttlSeconds) {
-        await this.redis.set(key, value, 'EX', ttlSeconds);
-    }
-    async get(key) {
-        return this.redis.get(key);
-    }
-    async delete(key) {
-        return this.redis.del(key);
+    async getAllBookings() {
+        return await this.bookingService.findAll();
     }
 };
-exports.RedisService = RedisService;
-exports.RedisService = RedisService = __decorate([
-    (0, common_1.Injectable)(),
-    __param(0, (0, common_1.Inject)('REDIS_CLIENT')),
-    __metadata("design:paramtypes", [Object])
-], RedisService);
+exports.BookingController = BookingController;
+__decorate([
+    (0, common_1.Post)(),
+    (0, common_1.UsePipes)(new common_1.ValidationPipe({ transform: true, whitelist: true })),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [typeof (_b = typeof create_booking_dto_1.CreateBookingDto !== "undefined" && create_booking_dto_1.CreateBookingDto) === "function" ? _b : Object]),
+    __metadata("design:returntype", Promise)
+], BookingController.prototype, "createBooking", null);
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], BookingController.prototype, "getAllBookings", null);
+exports.BookingController = BookingController = __decorate([
+    (0, common_1.Controller)('bookings'),
+    __metadata("design:paramtypes", [typeof (_a = typeof booking_service_1.BookingService !== "undefined" && booking_service_1.BookingService) === "function" ? _a : Object])
+], BookingController);
 
 
-/***/ },
+/***/ }),
+/* 28 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-/***/ "@nestjs/bull"
-/*!*******************************!*\
-  !*** external "@nestjs/bull" ***!
-  \*******************************/
-(module) {
 
-module.exports = require("@nestjs/bull");
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a, _b, _c;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CreateBookingDto = void 0;
+const class_validator_1 = __webpack_require__(29);
+const client_1 = __webpack_require__(11);
+class CreateBookingDto {
+    bookingRef;
+    provider;
+    status;
+    address;
+    latitude;
+    longitude;
+    startingDate;
+    customerName;
+    hotelName;
+    phone;
+    mail;
+    totalPax;
+    paxDetail;
+    tourType;
+    tourName;
+    payment;
+    rawDataId;
+}
+exports.CreateBookingDto = CreateBookingDto;
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", String)
+], CreateBookingDto.prototype, "bookingRef", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "provider", void 0);
+__decorate([
+    (0, class_validator_1.IsEnum)(client_1.BookingStatus),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", typeof (_a = typeof client_1.BookingStatus !== "undefined" && client_1.BookingStatus) === "function" ? _a : Object)
+], CreateBookingDto.prototype, "status", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "address", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "latitude", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "longitude", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "startingDate", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateBookingDto.prototype, "customerName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", String)
+], CreateBookingDto.prototype, "hotelName", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "phone", void 0);
+__decorate([
+    (0, class_validator_1.IsEmail)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "mail", void 0);
+__decorate([
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Number)
+], CreateBookingDto.prototype, "totalPax", void 0);
+__decorate([
+    (0, class_validator_1.IsObject)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "paxDetail", void 0);
+__decorate([
+    (0, class_validator_1.IsEnum)(client_1.TourType),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "tourType", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "tourName", void 0);
+__decorate([
+    (0, class_validator_1.IsEnum)(client_1.PaymentStatus),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "payment", void 0);
+__decorate([
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Object)
+], CreateBookingDto.prototype, "rawDataId", void 0);
 
-/***/ },
 
-/***/ "@nestjs/cache-manager"
-/*!****************************************!*\
-  !*** external "@nestjs/cache-manager" ***!
-  \****************************************/
-(module) {
-
-module.exports = require("@nestjs/cache-manager");
-
-/***/ },
-
-/***/ "@nestjs/common"
-/*!*********************************!*\
-  !*** external "@nestjs/common" ***!
-  \*********************************/
-(module) {
-
-module.exports = require("@nestjs/common");
-
-/***/ },
-
-/***/ "@nestjs/config"
-/*!*********************************!*\
-  !*** external "@nestjs/config" ***!
-  \*********************************/
-(module) {
-
-module.exports = require("@nestjs/config");
-
-/***/ },
-
-/***/ "@nestjs/core"
-/*!*******************************!*\
-  !*** external "@nestjs/core" ***!
-  \*******************************/
-(module) {
-
-module.exports = require("@nestjs/core");
-
-/***/ },
-
-/***/ "@nestjs/schedule"
-/*!***********************************!*\
-  !*** external "@nestjs/schedule" ***!
-  \***********************************/
-(module) {
-
-module.exports = require("@nestjs/schedule");
-
-/***/ },
-
-/***/ "@prisma/client"
-/*!*********************************!*\
-  !*** external "@prisma/client" ***!
-  \*********************************/
-(module) {
-
-module.exports = require("@prisma/client");
-
-/***/ },
-
-/***/ "cheerio"
-/*!**************************!*\
-  !*** external "cheerio" ***!
-  \**************************/
-(module) {
-
-module.exports = require("cheerio");
-
-/***/ },
-
-/***/ "class-validator"
-/*!**********************************!*\
-  !*** external "class-validator" ***!
-  \**********************************/
-(module) {
+/***/ }),
+/* 29 */
+/***/ ((module) => {
 
 module.exports = require("class-validator");
 
-/***/ },
+/***/ }),
+/* 30 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-/***/ "csv-parser"
-/*!*****************************!*\
-  !*** external "csv-parser" ***!
-  \*****************************/
-(module) {
 
-module.exports = require("csv-parser");
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AppController = void 0;
+const common_1 = __webpack_require__(3);
+const app_service_1 = __webpack_require__(31);
+let AppController = class AppController {
+    appService;
+    constructor(appService) {
+        this.appService = appService;
+    }
+    getHello() {
+        return this.appService.getHello();
+    }
+};
+exports.AppController = AppController;
+__decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", String)
+], AppController.prototype, "getHello", null);
+exports.AppController = AppController = __decorate([
+    (0, common_1.Controller)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof app_service_1.AppService !== "undefined" && app_service_1.AppService) === "function" ? _a : Object])
+], AppController);
 
-/***/ },
 
-/***/ "googleapis"
-/*!*****************************!*\
-  !*** external "googleapis" ***!
-  \*****************************/
-(module) {
+/***/ }),
+/* 31 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-module.exports = require("googleapis");
 
-/***/ },
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AppService = void 0;
+const common_1 = __webpack_require__(3);
+let AppService = class AppService {
+    getHello() {
+        return 'Hello World!';
+    }
+};
+exports.AppService = AppService;
+exports.AppService = AppService = __decorate([
+    (0, common_1.Injectable)()
+], AppService);
 
-/***/ "ioredis"
-/*!**************************!*\
-  !*** external "ioredis" ***!
-  \**************************/
-(module) {
 
-module.exports = require("ioredis");
+/***/ }),
+/* 32 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-/***/ },
 
-/***/ "crypto"
-/*!*************************!*\
-  !*** external "crypto" ***!
-  \*************************/
-(module) {
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DataModule = void 0;
+const common_1 = __webpack_require__(3);
+const data_controller_1 = __webpack_require__(33);
+const data_service_1 = __webpack_require__(34);
+const prisma_service_1 = __webpack_require__(10);
+let DataModule = class DataModule {
+};
+exports.DataModule = DataModule;
+exports.DataModule = DataModule = __decorate([
+    (0, common_1.Module)({
+        controllers: [data_controller_1.DataController],
+        providers: [data_service_1.DataService, prisma_service_1.PrismaService],
+    })
+], DataModule);
 
-module.exports = require("crypto");
 
-/***/ },
+/***/ }),
+/* 33 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-/***/ "fs"
-/*!*********************!*\
-  !*** external "fs" ***!
-  \*********************/
-(module) {
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DataController = void 0;
+const common_1 = __webpack_require__(3);
+const data_service_1 = __webpack_require__(34);
+let DataController = class DataController {
+    dataService;
+    constructor(dataService) {
+        this.dataService = dataService;
+    }
+    async importHotels() {
+        return this.dataService.importHotels();
+    }
+};
+exports.DataController = DataController;
+__decorate([
+    (0, common_1.Post)('import-hotels'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], DataController.prototype, "importHotels", null);
+exports.DataController = DataController = __decorate([
+    (0, common_1.Controller)('data'),
+    __metadata("design:paramtypes", [typeof (_a = typeof data_service_1.DataService !== "undefined" && data_service_1.DataService) === "function" ? _a : Object])
+], DataController);
+
+
+/***/ }),
+/* 34 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DataService = void 0;
+const common_1 = __webpack_require__(3);
+const prisma_service_1 = __webpack_require__(10);
+const fs_1 = __importDefault(__webpack_require__(35));
+const path_1 = __importDefault(__webpack_require__(36));
+const csv_parser_1 = __importDefault(__webpack_require__(37));
+let DataService = class DataService {
+    prisma;
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async importHotels() {
+        const hotels = [];
+        const csvPath = path_1.default.join(process.cwd(), 'src', 'data', 'hotelcoordinate.csv');
+        console.log('cwd:', process.cwd());
+        console.log('csvPath:', csvPath);
+        console.log('exists:', fs_1.default.existsSync(csvPath));
+        await new Promise((resolve, reject) => {
+            fs_1.default.createReadStream(csvPath)
+                .pipe((0, csv_parser_1.default)())
+                .on('data', (row) => {
+                hotels.push({
+                    hotelName: row.hotelName,
+                    starRating: row.starRating || null,
+                    address: row.address,
+                    coordinate: row.coordinate || null,
+                    latitude: Number(row.latitude),
+                    longitude: Number(row.longitude),
+                });
+            })
+                .on('end', () => resolve())
+                .on('error', reject);
+        });
+        const result = await this.prisma.coordinate.createMany({
+            data: hotels,
+            skipDuplicates: true,
+        });
+        return {
+            imported: result.count,
+            totalRows: hotels.length,
+        };
+    }
+};
+exports.DataService = DataService;
+exports.DataService = DataService = __decorate([
+    (0, common_1.Injectable)(),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], DataService);
+
+
+/***/ }),
+/* 35 */
+/***/ ((module) => {
 
 module.exports = require("fs");
 
-/***/ },
-
-/***/ "path"
-/*!***********************!*\
-  !*** external "path" ***!
-  \***********************/
-(module) {
+/***/ }),
+/* 36 */
+/***/ ((module) => {
 
 module.exports = require("path");
 
-/***/ }
+/***/ }),
+/* 37 */
+/***/ ((module) => {
 
-/******/ 	});
+module.exports = require("csv-parser");
+
+/***/ })
+/******/ 	]);
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
@@ -2037,12 +1983,6 @@ module.exports = require("path");
 /******/ 		};
 /******/ 	
 /******/ 		// Execute the module function
-/******/ 		if (!(moduleId in __webpack_modules__)) {
-/******/ 			delete __webpack_module_cache__[moduleId];
-/******/ 			var e = new Error("Cannot find module '" + moduleId + "'");
-/******/ 			e.code = 'MODULE_NOT_FOUND';
-/******/ 			throw e;
-/******/ 		}
 /******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
 /******/ 	
 /******/ 		// Return the exports of the module
@@ -2054,14 +1994,11 @@ var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
 var exports = __webpack_exports__;
-/*!*********************!*\
-  !*** ./src/main.ts ***!
-  \*********************/
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
-const app_module_1 = __webpack_require__(/*! @/app.module */ "./src/app.module.ts");
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const core_1 = __webpack_require__(1);
+const app_module_1 = __webpack_require__(2);
+const common_1 = __webpack_require__(3);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.setGlobalPrefix('api');

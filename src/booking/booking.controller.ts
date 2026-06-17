@@ -25,3 +25,27 @@ export class BookingController {
     return await this.bookingService.findAll();
   }
 }
+
+
+
+
+// // src/booking/booking.controller.ts
+// import { Controller, Patch, Param, Body } from '@nestjs/common';
+// import { BookingService } from './booking.service';
+
+// @Controller('booking')
+// export class BookingController {
+//   constructor(private readonly bookingService: BookingService) {}
+
+//   /**
+//    * 🎛️ CAPTURE FRONTEND DROPS: Re-index positions instantly on a single targeted call
+//    */
+//   @Patch(':id/sequence')
+//   async syncDroppedSequence(
+//     @Param('id') bookingId: string,
+//     @Body() body: { targetVehicleId: string | null; newIndex: number }
+//   ) {
+//     // This executes your highly optimized layout shifting transaction query block cleanly
+//     return await this.bookingService.updateSequence(bookingId, body.targetVehicleId, body.newIndex);
+//   }
+// }
