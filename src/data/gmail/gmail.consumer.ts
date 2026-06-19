@@ -176,7 +176,8 @@ export class GmailConsumer {
       this.logger.log(`[COMPLETED SUCCESS] Booking pipeline closed cleanly for reference key: ${bookingKey}.`);
 
     } catch (error) {
-      this.logger.error(`[PIPELINE FAILURE] Failed processing booking metrics: ${error.message}`);
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`[PIPELINE FAILURE] Failed processing booking metrics: ${message}`);
       await this.prisma.rawData.update({
         where: { id: rawDataRecord.id },
         data: { status: 'FAILED' },

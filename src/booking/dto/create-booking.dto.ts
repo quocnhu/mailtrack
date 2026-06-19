@@ -72,4 +72,5 @@ export class CreateBookingDto {
   @IsString()
   @IsNotEmpty()
   rawDataId?: string | null; // Liên kết thô với RawData để dễ dàng truy vết nguồn gốc
+
 }

@@ -24,12 +24,12 @@ const common_1 = __webpack_require__(3);
 const schedule_1 = __webpack_require__(4);
 const config_1 = __webpack_require__(5);
 const gmail_module_1 = __webpack_require__(6);
-const app_controller_1 = __webpack_require__(30);
-const app_service_1 = __webpack_require__(31);
+const app_controller_1 = __webpack_require__(31);
+const app_service_1 = __webpack_require__(32);
 const redis_module_1 = __webpack_require__(14);
 const prisma_module_1 = __webpack_require__(13);
 const bull_1 = __webpack_require__(12);
-const data_module_1 = __webpack_require__(32);
+const data_module_1 = __webpack_require__(33);
 const booking_module_1 = __webpack_require__(26);
 let AppModule = class AppModule {
 };
@@ -1371,6 +1371,7 @@ let BookingService = class BookingService {
                     tourType: newBooking.tourType,
                     tourName: newBooking.tourName,
                     startingDate: newBooking.startingDate,
+                    totalPax: newBooking.totalPax,
                 }, {
                     attempts: 3,
                     backoff: 5000,
@@ -1394,111 +1395,69 @@ let BookingService = class BookingService {
         }
     }
     async cancelBooking(bookingRef) {
-        try {
-            return await this.prisma.$transaction(async (tx) => {
-                const target = await tx.booking.findUnique({
-                    where: { bookingRef: bookingRef },
-                    include: { assignment: true }
-                });
-                if (!target) {
-                    throw new common_1.NotFoundException(`Requested operational record '${bookingRef}' not found.`);
-                }
-                if (target.vehicleId && target.assignment) {
-                    const currentSequenceIndex = target.assignment.sequenceIndex;
-                    const assignedVehicleId = target.vehicleId;
-                    await tx.assignment.delete({
-                        where: { bookingId: target.id }
-                    });
-                    await tx.assignment.updateMany({
-                        where: {
-                            vehicleId: assignedVehicleId,
-                            sequenceIndex: { gt: currentSequenceIndex }
-                        },
-                        data: { sequenceIndex: { decrement: 1 } }
-                    });
-                }
-                return await tx.booking.update({
-                    where: { bookingRef: bookingRef },
-                    data: {
-                        status: client_1.BookingStatus.CANCELED,
-                        vehicleId: null,
-                        lanePosition: null
-                    }
-                });
+        return await this.prisma.$transaction(async (tx) => {
+            const target = await tx.booking.findUnique({
+                where: { bookingRef },
+                include: { assignment: true }
             });
-        }
-        catch (error) {
-            if (error instanceof common_1.NotFoundException)
-                throw error;
-            console.error('[Dispatcher Error] Safe cancellation sequence interrupted:', error);
-            throw new common_1.InternalServerErrorException('Dispatcher failed to safely clear lane structure during cancellation.');
-        }
-    }
-    async findAll() {
-        try {
-            return await this.prisma.booking.findMany({
-                include: {
-                    assignment: true
-                },
-                orderBy: [
-                    { startingDate: 'asc' },
-                    { tourName: 'asc' }
-                ]
+            if (!target)
+                throw new common_1.NotFoundException(`Record '${bookingRef}' not found.`);
+            const assignments = target.assignment || [];
+            const assignment = assignments[0];
+            if (target.vehicleId && assignment) {
+                await tx.assignment.delete({ where: { id: assignment.id } });
+                await tx.assignment.updateMany({
+                    where: {
+                        vehicleId: target.vehicleId,
+                        sequenceIndex: { gt: assignment.sequenceIndex }
+                    },
+                    data: { sequenceIndex: { decrement: 1 } }
+                });
+            }
+            return await tx.booking.update({
+                where: { bookingRef },
+                data: { status: client_1.BookingStatus.CANCELED, vehicleId: null, lanePosition: null }
             });
-        }
-        catch (error) {
-            console.error('[Prisma Error] Failed to fetch active dispatch map:', error);
-            throw new common_1.InternalServerErrorException('Could not retrieve booking configurations.');
-        }
+        });
     }
     async updateDroppedSequence(bookingId, targetVehicleId, newSequenceIndex) {
-        try {
-            return await this.prisma.$transaction(async (tx) => {
-                const currentAssignment = await tx.assignment.findUnique({
-                    where: { bookingId }
-                });
-                if (!currentAssignment) {
-                    await tx.assignment.create({
-                        data: { bookingId, vehicleId: targetVehicleId || 'UNASSIGNED', sequenceIndex: newSequenceIndex }
-                    });
-                }
-                else {
-                    await tx.assignment.delete({ where: { bookingId } });
-                    await tx.assignment.updateMany({
-                        where: {
-                            vehicleId: currentAssignment.vehicleId,
-                            sequenceIndex: { gt: currentAssignment.sequenceIndex }
-                        },
-                        data: { sequenceIndex: { decrement: 1 } }
-                    });
-                }
-                if (targetVehicleId) {
-                    await tx.assignment.updateMany({
-                        where: {
-                            vehicleId: targetVehicleId,
-                            sequenceIndex: { gte: newSequenceIndex }
-                        },
-                        data: { sequenceIndex: { increment: 1 } }
-                    });
-                    await tx.assignment.upsert({
-                        where: { bookingId },
-                        create: { bookingId, vehicleId: targetVehicleId, sequenceIndex: newSequenceIndex },
-                        update: { vehicleId: targetVehicleId, sequenceIndex: newSequenceIndex }
-                    });
-                }
-                return await tx.booking.update({
-                    where: { id: bookingId },
-                    data: {
-                        vehicleId: targetVehicleId,
-                        status: targetVehicleId ? 'ASSIGNED' : 'PENDING'
-                    }
-                });
+        return await this.prisma.$transaction(async (tx) => {
+            const currentAssignment = await tx.assignment.findFirst({
+                where: { bookingId }
             });
-        }
-        catch (error) {
-            console.error('[Dispatcher Drag Error] Failed to persist layout shift:', error);
-            throw new common_1.InternalServerErrorException('Database failed to re-index lanes during layout shift.');
-        }
+            if (currentAssignment) {
+                await tx.assignment.delete({ where: { id: currentAssignment.id } });
+                await tx.assignment.updateMany({
+                    where: {
+                        vehicleId: currentAssignment.vehicleId,
+                        sequenceIndex: { gt: currentAssignment.sequenceIndex }
+                    },
+                    data: { sequenceIndex: { decrement: 1 } }
+                });
+            }
+            if (targetVehicleId) {
+                await tx.assignment.updateMany({
+                    where: { vehicleId: targetVehicleId, sequenceIndex: { gte: newSequenceIndex } },
+                    data: { sequenceIndex: { increment: 1 } }
+                });
+                await tx.assignment.create({
+                    data: { bookingId, vehicleId: targetVehicleId, sequenceIndex: newSequenceIndex }
+                });
+            }
+            return await tx.booking.update({
+                where: { id: bookingId },
+                data: {
+                    vehicleId: targetVehicleId,
+                    status: targetVehicleId ? 'ASSIGNED' : 'PENDING'
+                }
+            });
+        });
+    }
+    async findAll() {
+        return await this.prisma.booking.findMany({
+            include: { assignment: true },
+            orderBy: [{ startingDate: 'asc' }, { tourName: 'asc' }]
+        });
     }
 };
 exports.BookingService = BookingService;
@@ -1533,6 +1492,7 @@ const booking_controller_1 = __webpack_require__(27);
 const booking_service_1 = __webpack_require__(24);
 const prisma_module_1 = __webpack_require__(13);
 const bull_1 = __webpack_require__(12);
+const booking_assignment_consumer_1 = __webpack_require__(30);
 let BookingModule = class BookingModule {
 };
 exports.BookingModule = BookingModule;
@@ -1545,7 +1505,7 @@ exports.BookingModule = BookingModule = __decorate([
             })
         ],
         controllers: [booking_controller_1.BookingController],
-        providers: [booking_service_1.BookingService],
+        providers: [booking_service_1.BookingService, booking_assignment_consumer_1.BookingAssignmentProcessor],
         exports: [booking_service_1.BookingService],
     })
 ], BookingModule);
@@ -1754,11 +1714,114 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var BookingAssignmentProcessor_1;
+var _a;
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BookingAssignmentProcessor = void 0;
+const bull_1 = __webpack_require__(12);
+const prisma_service_1 = __webpack_require__(10);
+const common_1 = __webpack_require__(3);
+let BookingAssignmentProcessor = BookingAssignmentProcessor_1 = class BookingAssignmentProcessor {
+    prisma;
+    logger = new common_1.Logger(BookingAssignmentProcessor_1.name);
+    constructor(prisma) {
+        this.prisma = prisma;
+    }
+    async handleAutoGrouping(job) {
+        const { bookingId, tourName, tourType, startingDate, totalPax } = job.data;
+        this.logger.log(`Processing booking: ${job.data.bookingId}, Pax: ${job.data.totalPax}`);
+        const targetDate = new Date(startingDate);
+        if (tourType === 'PRIVATE_TOUR') {
+            const newVehicleId = `BUS-PVT-${Date.now()}`;
+            await this.assignToNewLane(bookingId, newVehicleId, 0);
+            return;
+        }
+        let remainingPax = totalPax;
+        while (remainingPax > 0) {
+            const currentBatchPax = Math.min(remainingPax, 12);
+            const existingLane = await this.findAvailableGroupLane(tourName, targetDate, currentBatchPax);
+            if (existingLane) {
+                const nextIndex = await this.getNextSequenceIndex(existingLane.vehicleId);
+                await this.prisma.assignment.create({
+                    data: {
+                        bookingId: bookingId,
+                        vehicleId: existingLane.vehicleId,
+                        sequenceIndex: nextIndex
+                    }
+                });
+                remainingPax -= currentBatchPax;
+            }
+            else {
+                const newVehicleId = `BUS-GRP-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+                await this.assignToNewLane(bookingId, newVehicleId, 0);
+                remainingPax -= currentBatchPax;
+            }
+        }
+    }
+    async findAvailableGroupLane(tourName, date, incomingPax) {
+        const startOfDay = new Date(date.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(date.setHours(23, 59, 59, 999));
+        const activeAssignments = await this.prisma.assignment.findMany({
+            where: {
+                booking: {
+                    tourName,
+                    startingDate: { gte: startOfDay, lte: endOfDay }
+                }
+            },
+            include: { booking: true }
+        });
+        const laneOccupancy = {};
+        activeAssignments.forEach((a) => {
+            laneOccupancy[a.vehicleId] = (laneOccupancy[a.vehicleId] || 0) + (a.booking.totalPax / Math.ceil(a.booking.totalPax / 12));
+        });
+        for (const [vehicleId, currentPaxTotal] of Object.entries(laneOccupancy)) {
+            if (currentPaxTotal + incomingPax <= 12) {
+                return { vehicleId };
+            }
+        }
+        return null;
+    }
+    async getNextSequenceIndex(vehicleId) {
+        return await this.prisma.assignment.count({ where: { vehicleId } });
+    }
+    async assignToNewLane(bookingId, vehicleId, index) {
+        await this.prisma.assignment.create({
+            data: { bookingId, vehicleId, sequenceIndex: index }
+        });
+    }
+};
+exports.BookingAssignmentProcessor = BookingAssignmentProcessor;
+__decorate([
+    (0, bull_1.Process)('manual-assign-operator-job'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], BookingAssignmentProcessor.prototype, "handleAutoGrouping", null);
+exports.BookingAssignmentProcessor = BookingAssignmentProcessor = BookingAssignmentProcessor_1 = __decorate([
+    (0, bull_1.Processor)('booking-assignment-queue'),
+    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object])
+], BookingAssignmentProcessor);
+
+
+/***/ }),
+/* 31 */
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const common_1 = __webpack_require__(3);
-const app_service_1 = __webpack_require__(31);
+const app_service_1 = __webpack_require__(32);
 let AppController = class AppController {
     appService;
     constructor(appService) {
@@ -1782,7 +1845,7 @@ exports.AppController = AppController = __decorate([
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1807,7 +1870,7 @@ exports.AppService = AppService = __decorate([
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1820,8 +1883,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataModule = void 0;
 const common_1 = __webpack_require__(3);
-const data_controller_1 = __webpack_require__(33);
-const data_service_1 = __webpack_require__(34);
+const data_controller_1 = __webpack_require__(34);
+const data_service_1 = __webpack_require__(35);
 const prisma_service_1 = __webpack_require__(10);
 let DataModule = class DataModule {
 };
@@ -1835,7 +1898,7 @@ exports.DataModule = DataModule = __decorate([
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1852,7 +1915,7 @@ var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataController = void 0;
 const common_1 = __webpack_require__(3);
-const data_service_1 = __webpack_require__(34);
+const data_service_1 = __webpack_require__(35);
 let DataController = class DataController {
     dataService;
     constructor(dataService) {
@@ -1876,7 +1939,7 @@ exports.DataController = DataController = __decorate([
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 
@@ -1897,9 +1960,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DataService = void 0;
 const common_1 = __webpack_require__(3);
 const prisma_service_1 = __webpack_require__(10);
-const fs_1 = __importDefault(__webpack_require__(35));
-const path_1 = __importDefault(__webpack_require__(36));
-const csv_parser_1 = __importDefault(__webpack_require__(37));
+const fs_1 = __importDefault(__webpack_require__(36));
+const path_1 = __importDefault(__webpack_require__(37));
+const csv_parser_1 = __importDefault(__webpack_require__(38));
 let DataService = class DataService {
     prisma;
     constructor(prisma) {
@@ -1945,19 +2008,19 @@ exports.DataService = DataService = __decorate([
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ ((module) => {
 
 module.exports = require("path");
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ ((module) => {
 
 module.exports = require("csv-parser");
@@ -2001,6 +2064,11 @@ const app_module_1 = __webpack_require__(2);
 const common_1 = __webpack_require__(3);
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
+    app.enableCors({
+        origin: ['http://localhost:3000'],
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+        credentials: true,
+    });
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new common_1.ValidationPipe({
         transform: true,

@@ -101,21 +101,22 @@ model Booking {
 
   // 🎯 Add these operational fields right here:
   vehicleId    String?       // Tracks which bus layout container this booking belongs to
-  lanePosition String?       // Tracks visual dispatch grouping metadata
 
   // 🔗 Establish the relation link to the Assignment model
-  assignment   Assignment?
+  assignment   Assignment[]
 }
+//__________________________________________________
 
 model Assignment {
   id            String   @id @default(uuid())
-  bookingId     String   @unique // Matches Booking.id type (String)
-  vehicleId     String
-  sequenceIndex Int
+  vehicleId     String 
+  sequenceIndex Int     // This defines the "Lane Position"
 
-  // 🔗 Explicit relationship configuration mapping back to your parent booking table
-  booking       Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  bookingId     String  
+  booking       Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
 }
+//_______________________________________________________
 
 model AuditLog {
   id         String   @id @default(uuid())
