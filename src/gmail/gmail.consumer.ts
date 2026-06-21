@@ -4,7 +4,7 @@ import { Logger, Inject } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
-import { PaymentStatus,TourType, BookingStatus, Prisma } from '@prisma/client';
+import { PaymentStatus, TourType, BookingStatus, Prisma } from '@prisma/client';
 import { ParsedEmailDto } from './dto/parsedEmail.dto';
 import { GmailParserUtil } from './utils/gmail-parser.util';
 import { BookingService } from '../booking/booking.service';
@@ -35,9 +35,9 @@ export class GmailConsumer {
       const parsed: ParsedEmailDto = GmailParserUtil.parseEmailBody(messageData);
       // I will check right here to kick out any email with booking status is unknown will not be in stage 2, to save resource and avoid junk email
       const bookingData = parsed.bookingData;
-        
 
-  
+
+
 
       // 🎯 Check bookingRef to prevent junk 
       if (!bookingData?.bookingRef) {
@@ -88,88 +88,76 @@ export class GmailConsumer {
     try {
       const bookingData = parsedPayload.bookingData;
       console.log('Booking Data Extracted from Parsed Payload:', bookingData);
-      // const provider = parsedPayload.provider || bookingData?.provider || 'unknown';
+      // HANDLING LONGITUDE & LATITUDE
+      // 1. EXTRACT RAW GEO DATA
+      const rawAddress = bookingData?.hotelAddress || bookingData?.pickupLocation || bookingData?.pickUpAddress;
+      const hotelName = bookingData?.pickUp || bookingData?.hotelName || 'Unknown Hotel';
 
-      // ─── 🛠️ BỘ KHUÔN ADAPTER - ĐỒNG NHẤT DỮ LIỆU ĐA NGUỒN CHỐNG NULL ───
+      let finalCoordinates = { lat: null as number | null, lng: null as number | null };
+
+      console.log(`[GEO-DEBUG] Extracted raw address: "${rawAddress}", hotel name: "${hotelName}"`);
+      console.log("check finalCoordinates before lookup:", finalCoordinates);
+
+      // 2. RUN GEO-LOOKUP LOGIC
+      if (rawAddress) {
+        // Regex to extract the first part: the number(s) + the main street name
+        // This matches patterns like "65 Le Loi", "19-23 Lam Son", "2A-4A Ton Duc Thang"
+        const streetRegex = /^(\d+[-\d]*\s+[\w\s]+)/i;
+        const match = rawAddress.match(streetRegex);
+
+        // Use the regex match if found, otherwise fallback to the original logic
+        const searchKey = match ? match[0].trim().toLowerCase() : rawAddress.split(',')[0].trim().toLowerCase();
+
+        this.logger.log(`[GEO-DEBUG] Searching DB for street: "${searchKey}"`);
+
+        const dbRecord = await this.prisma.coordinate.findFirst({
+          where: {
+            address: {
+              contains: searchKey,
+              mode: 'insensitive',
+            },
+          },
+        });
+
+        if (dbRecord) {
+          finalCoordinates = { lat: dbRecord.latitude, lng: dbRecord.longitude };
+          this.logger.log(`[GEO-DB HIT] Successfully matched "${rawAddress}" to "${dbRecord.address}"`);
+
+          // Update cache
+          await this.cacheManager.set(`geo:${rawAddress.trim().toLowerCase()}`, JSON.stringify({
+            lat: dbRecord.latitude,
+            lng: dbRecord.longitude,
+            hotelName: dbRecord.hotelName
+          }), 2592000);
+        } else {
+          this.logger.warn(`[GEO-DB MISS] No record found for key: "${searchKey}"`);
+        }
+      }
+
       
-      // 1. Đồng nhất Địa chỉ & Tên điểm đón
-      // const rawAddress = bookingData?.pickUpAddress || bookingData?.hotelAddress || bookingData?.pickupLocation;
-      // const hotelName = bookingData?.pickUp || bookingData?.hotelName || 'Unknown Hotel';
-
-      // // 2. Đồng nhất Ngày khởi hành (chuyển về ISO String)
-
-      // // ─── 📍 HỆ THỐNG PHÂN PHỐI & TRUY VẾT TỌA ĐỘ 3 TẦNG ───────────────────
-      // let latitude: number | null = null;
-      // let longitude: number | null = null;
-      // const lookupTarget = rawAddress || hotelName;
-
-      // if (lookupTarget && lookupTarget !== 'Unknown Hotel') {
-      //   const cacheKey = `geo:${lookupTarget.trim().toLowerCase()}`;
-
-      //   try {
-      //     // 🔎 TẦNG 1: Memory Cache (Redis / In-Memory)
-      //     const cachedCoords = await this.cacheManager.get<{ lat: number; lng: number }>(cacheKey);
-
-      //     if (cachedCoords) {
-      //       this.logger.log(`[GEO-HIT][MEMORY] Found coordinates in Cache for: ${lookupTarget}`);
-      //       latitude = cachedCoords.lat;
-      //       longitude = cachedCoords.lng;
-      //     } else {
-      //       // 🔎 TẦNG 2: Memory Cache trượt -> Kiểm tra vết vật lý dưới Database
-      //       this.logger.log(`[GEO-MISS][MEMORY] Checking DB Coordinate table for: ${lookupTarget}`);
-
-      //       const dbCoordinate = await this.prisma.coordinate.findFirst({
-      //         where: {
-      //           OR: [
-      //             { address: lookupTarget },
-      //             { hotelName: hotelName }
-      //           ]
-      //         },
-      //       });
-
-      //       if (dbCoordinate) {
-      //         this.logger.log(`[GEO-HIT][DATABASE] Found coordinates in DB for: ${lookupTarget}`);
-      //         latitude = dbCoordinate.latitude;
-      //         longitude = dbCoordinate.longitude;
-
-      //         // Bù đắp ngược lại cho Memory Cache giữ trong 1 tháng
-      //         await this.cacheManager.set(cacheKey, { lat: latitude, lng: longitude }, 30 * 24 * 60 * 60 * 1000);
-      //       } else {
-      //         // 🔎 TẦNG 3: Cả hai nơi trượt -> Sẵn sàng gọi API Google Maps thực tế ở đây
-      //         this.logger.log(`[GEO-MISS][ALL] Triggering live Geocoding API for: ${lookupTarget}`);
-      //         latitude = null;
-      //         longitude = null;
-      //       }
-      //     }
-      //   } catch (geoError) {
-      //     this.logger.warn(`[GEO-ERROR] Geocoding workflow encountered an error. Proceeding with null.`);
-      //   }
-      // }
-
-      // ─── 🛠️ ĐÚC BẢNG BOOKING (MỘT KHUÔN ĐẦU VÀO ĐỒNG NHẤT) ───────────────────
       try {
         await this.bookingService.create({
           bookingRef: bookingData?.bookingRef,
           provider: bookingData?.provider || 'UNKNOWN',
           status: BookingStatus.PENDING,
           address: bookingData?.pickUpAddress || null,
-          latitude: null,
-          longitude: null,
+          latitude: finalCoordinates.lat,
+          longitude: finalCoordinates.lng,
 
           // Nạp dữ liệu qua bộ biến đã được chuẩn hóa, chống Null hoàn toàn
           startingDate: bookingData?.date || bookingData?.tripDate || null,
-          customerName: bookingData?.customer || bookingData?.billingName || 'Unknown Customer', 
-          phone: bookingData?.customerPhone || bookingData?.billingCity || null, 
-          mail: bookingData?.customerEmail || bookingData?.billingEmail || null, 
+          customerName: bookingData?.customer || bookingData?.billingName || 'Unknown Customer',
+          phone: bookingData?.customerPhone || bookingData?.billingCity || null,
+          mail: bookingData?.customerEmail || bookingData?.billingEmail || null,
           totalPax: bookingData?.paxTotal || bookingData?.travellers || 0,
-          paxDetail: bookingData?.pax || bookingData?.priceLines || null, 
+          paxDetail: bookingData?.pax || bookingData?.priceLines || null,
           hotelName: bookingData?.pickUp || 'Unknown Hotel' || null,
-          tourType: bookingData?.tourType ? (bookingData.tourType as TourType) : null, 
-          tourName: bookingData?.tourName || null, 
+          tourType: bookingData?.tourType ? (bookingData.tourType as TourType) : null,
+          tourName: bookingData?.tourName || null,
           payment: PaymentStatus.PENDING,
-          rawDataId: rawId || null, 
+          rawDataId: rawId || null,
         });
-        
+
         this.logger.log(`[POSTGRES] Booking created successfully with full unified fields.`);
       } catch (dbError) {
         if (dbError instanceof Prisma.PrismaClientKnownRequestError && dbError.code === 'P2002') {

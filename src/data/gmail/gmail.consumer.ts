@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { RedisService } from '@/redis/redis.service';
 import { ParsedEmailDto } from './dto/parsedEmail.dto';
-import { TourType, BookingStatus } from '@prisma/client'; 
+import { TourType, BookingStatus } from '@prisma/client';
 
 // 🌐 REAL GOOGLE MAPS IMPORTS (Kept for future use)
 // import { Client as GoogleMapsClient } from '@googlemaps/google-maps-services-js';
@@ -44,73 +44,75 @@ export class GmailConsumer {
 
     try {
       // ─── STEP 2: MULTI-LAYER COST-SAVING GEOCODING LAYER ────────────
-      const rawAddress = payload.bookingData?.hotelAddress || payload.bookingData?.pickupLocation;
-      const hotelName = payload.bookingData?.hotelName || 'Unknown Hotel';
-      
-      let finalCoordinates = { lat: null as number | null, lng: null as number | null };
+      const rawAddress =
+        payload.bookingData?.hotelAddress ||
+        payload.bookingData?.pickupLocation ||
+        payload.bookingData?.pickUpAddress;
 
+      const hotelName = payload.bookingData?.pickUp || payload.bookingData?.hotelName || '';
+
+      // CRITICAL LOG: See exactly what we are processing
+      this.logger.log(`[GEO-DEBUG] Attempting lookup: Address="${rawAddress}", Hotel="${hotelName}"`);
+
+      let finalCoordinates = { lat: null as number | null, lng: null as number | null };
+      console.log(`[GEO-DEBUG] Raw Address: "${rawAddress}", Hotel Name: "${hotelName}"`);
       if (rawAddress) {
+        // Normalize strings for comparison
         const sanitizedAddress = rawAddress.trim().toLowerCase();
+        const normalizedHotelName = hotelName.trim().toLowerCase();
+
         const redisGeoKey = `geo:cache:${sanitizedAddress}`;
 
         // LAYER 1: CHECK REDIS CACHE (RAM) 
-        const cachedCoordinates = await this.redisService.get(redisGeoKey);
-        
-        if (cachedCoordinates) {
-          this.logger.log(`[GEO-CACHE HIT] Found coordinates in Redis RAM for: ${sanitizedAddress}`);
-          finalCoordinates = JSON.parse(cachedCoordinates);
+        const cachedData = await this.redisService.get(redisGeoKey);
+
+        if (cachedData) {
+          const parsed = JSON.parse(cachedData);
+          // Validate hotelName match on cached record
+          if (parsed.hotelName?.toLowerCase().trim() === normalizedHotelName) {
+            this.logger.log(`[GEO-CACHE HIT] Found coordinates in Redis RAM for: ${sanitizedAddress}`);
+            finalCoordinates = { lat: parsed.lat, lng: parsed.lng };
+          } else {
+            this.logger.warn(`[GEO-CACHE MISMATCH] Hotel name mismatch for address: ${sanitizedAddress}`);
+          }
         } else {
-          
-          // LAYER 2: CHECK POSTGRES TABLE (DATABASE COOLDOWN CACHE)
+          // LAYER 2: CHECK POSTGRES TABLE
           this.logger.log(`[GEO-CACHE MISS] Checking Postgres Coordinate Table for: ${sanitizedAddress}`);
-          const dbCoordinates = await this.prisma.coordinate.findUnique({
+
+          const dbRecord = await this.prisma.coordinate.findUnique({
             where: { address: sanitizedAddress },
           });
 
-          if (dbCoordinates) {
+          // Validate hotelName match on DB record
+          if (dbRecord && dbRecord.hotelName?.toLowerCase().trim() === normalizedHotelName) {
             this.logger.log(`[GEO-DB HIT] Found coordinates in Postgres Table. Saving to Redis RAM.`);
-            finalCoordinates = { lat: dbCoordinates.latitude, lng: dbCoordinates.longitude };
-            
+            finalCoordinates = { lat: dbRecord.latitude, lng: dbRecord.longitude };
+
             const ONE_MONTH_SECONDS = 30 * 24 * 60 * 60;
-            await this.redisService.set(redisGeoKey, JSON.stringify(finalCoordinates), ONE_MONTH_SECONDS);
+            await this.redisService.set(
+              redisGeoKey,
+              JSON.stringify({
+                lat: dbRecord.latitude,
+                lng: dbRecord.longitude,
+                hotelName: dbRecord.hotelName
+              }),
+              ONE_MONTH_SECONDS
+            );
           } else {
-            
-            // 🛑 LAYER 3: REAL GOOGLE API CALL WITH ALLEYWAY FALLBACK (TEMPORARILY DISABLED)
-            this.logger.warn(`[GEO-LOCAL MISS] Address not found in local DB cache. Google API is disabled. Proceeding with null values.`);
+            // LOG: Capture the inputs that failed to match
+            this.logger.warn(`[GEO-MISS] No match found for Address: "${sanitizedAddress}" and Hotel: "${normalizedHotelName}"`);
+
+            // LOG: If you have a dbRecord, log what the DB actually had 
+            // so you can see if it was a wrong name or a missing address
+            if (dbRecord) {
+              this.logger.debug(`[GEO-DEBUG] DB record found, but name mismatch. DB Name: "${dbRecord.hotelName}"`);
+            } else {
+              this.logger.debug(`[GEO-DEBUG] No record found in DB for address: "${sanitizedAddress}"`);
+            }
+
             finalCoordinates = { lat: null, lng: null };
 
-            /* ── UNCOMMENT THIS ENTIRE BLOCK TO RE-ENABLE GOOGLE MAPS API ──
-            this.logger.warn(`[GEO-EXTERNAL] Hitting Google Maps API for: ${sanitizedAddress}`);
-            
-            await this.preventGeocodingSpam(sanitizedAddress);
-
-            try {
-              const googleResult = await this.callGoogleGeocodingApi(rawAddress);
-
-              if (googleResult && googleResult.lat && googleResult.lng) {
-                this.logger.log(`[GEO-GOOGLE SUCCESS] Address resolved. Saving to permanent lookup tables.`);
-                finalCoordinates = { lat: googleResult.lat, lng: googleResult.lng };
-
-                await this.prisma.coordinate.create({
-                  data: {
-                    address: sanitizedAddress,
-                    hotelName: hotelName,
-                    latitude: finalCoordinates.lat || 0, 
-                    longitude: finalCoordinates.lng || 0, 
-                  },
-                });
-
-                const ONE_MONTH_SECONDS = 30 * 24 * 60 * 60;
-                await this.redisService.set(redisGeoKey, JSON.stringify(finalCoordinates), ONE_MONTH_SECONDS);
-              } else {
-                this.logger.warn(`[GEO-GOOGLE NULL] Google could not resolve matching coordinates for "${sanitizedAddress}". Using fallback null fields.`);
-                finalCoordinates = { lat: null, lng: null };
-              }
-            } catch (googleApiError) {
-              this.logger.error(`[GEO-GOOGLE CRASH] External Google HTTP endpoint failure: ${googleApiError.message}`);
-              finalCoordinates = { lat: null, lng: null };
-            }
-            ─────────────────────────────────────────────────────────────── */
+            /* ... Proceed to Google API Logic ... */
           }
         }
       }
@@ -140,18 +142,18 @@ export class GmailConsumer {
         data: {
           bookingRef: bookingData?.bookingRef || `REF-${Date.now()}`,
           provider: payload.provider,
-          status: BookingStatus.PENDING, 
-          
+          status: BookingStatus.PENDING,
+
           address: rawAddress || null,
           latitude: finalCoordinates.lat,
           longitude: finalCoordinates.lng,
-          
+
           startingDate: parsedStartingDate,
 
           customerName: bookingData?.customerName || 'Unknown Customer',
           phone: bookingData?.customerPhone || null,
-          mail: bookingData?.customerEmail || null, 
-          
+          mail: bookingData?.customerEmail || null,
+
           totalPax: calculatedTotalPax > 0 ? calculatedTotalPax : (bookingData?.totalPax || 0),
           paxDetail: {
             adults: totalAdults,
@@ -161,9 +163,9 @@ export class GmailConsumer {
 
           tourType: mappedTourType,
           tourName: bookingData?.tourName || 'Standard Tour',
-          
-          payment: null, 
-          rawDataId: rawDataRecord.id, 
+
+          payment: null,
+          rawDataId: rawDataRecord.id,
         },
       });
 
@@ -182,58 +184,8 @@ export class GmailConsumer {
         where: { id: rawDataRecord.id },
         data: { status: 'FAILED' },
       });
-      throw error; 
+      throw error;
     }
   }
-
-  /**
-   * ─── REAL GOOGLE GEOCODING API IMPLEMENTATION (Kept for future use)
-   */
-  /* private async callGoogleGeocodingApi(address: string): Promise<{ lat: number, lng: number } | null> {
-    try {
-      const response = await this.googleMapsClient.geocode({
-        params: {
-          address: address,
-          key: process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_FALLBACK',
-        },
-        timeout: 5000, 
-      });
-
-      if (response.data.results && response.data.results.length > 0) {
-        const location = response.data.results[0].geometry.location;
-        return {
-          lat: location.lat,
-          lng: location.lng,
-        };
-      }
-
-      return null;
-    } catch (error) {
-      this.logger.error(`[GOOGLE MAPS SDK ERROR] Failed fetching address payload: ${error.message}`);
-      throw error; 
-    }
-  }
-  */
-
-  /**
-   * Anti-Spam Layer Strategy Tracker (Kept for future use)
-   */
-  /*
-  private async preventGeocodingSpam(sanitizedAddress: string): Promise<void> {
-    const rateLimitKey = `geo:limit:window`;
-    const currentHits = await this.redisService.get(rateLimitKey);
-    const limit = 20; 
-
-    if (currentHits && Number(currentHits) >= limit) {
-      this.logger.error(`[ANTI-SPAM ALERT] Geocoding system ceiling threshold reached (${currentHits}/${limit}).`);
-      throw new Error('Geocoding system rate limit triggered. Postponing job execution for cooldown.');
-    }
-
-    if (!currentHits) {
-      await this.redisService.set(rateLimitKey, '1', 60); 
-    } else {
-      await this.redisService.incr(rateLimitKey);
-    }
-  }
-  */
 }
+ 

@@ -43,7 +43,6 @@ export class BookingService {
           payment: dto.payment || 'PENDING',
           rawDataId: dto.rawDataId ?? null,
           vehicleId: null,
-          lanePosition: null,
         },
       });
 
@@ -105,7 +104,7 @@ export class BookingService {
 
     return await tx.booking.update({
       where: { bookingRef },
-      data: { status: BookingStatus.CANCELED, vehicleId: null, lanePosition: null }
+      data: { status: BookingStatus.CANCELED, vehicleId: null }
     });
   });
 }
