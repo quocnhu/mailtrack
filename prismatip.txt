@@ -56,3 +56,143 @@ A good rule:
 Development → migrate dev
 Production → migrate deploy
 Avoid db push except for quick experiments.
+
+===================original prisma===============================
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── ENUMS ───────────────────────────────────────────────────────────
+enum TourType {
+  PRIVATE_TOUR
+  GROUP_TOUR
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  REFUNDED
+}
+
+enum BookingStatus {
+  PENDING
+  ASSIGNED
+  CANCELED 
+}
+
+// ─── GMAIL ACCOUNT MODEL ─────────────────────────────────────────────
+model GmailAccount {
+  id              String       @id @default(uuid())
+  email           String       @unique
+  lastHistoryId   String
+  watchExpiration DateTime
+  refreshToken    String
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+// ─── RAW DATA LANDING PAD ────────────────────────────────────────────
+model RawData {
+  id        String   @id @default(uuid())
+  sourceId  String   @unique
+  payload   Json
+  status    String   // 'PENDING', 'PROCESSED', 'FAILED'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 1-to-1 link forward to the final Booking record
+  booking   Booking?
+}
+
+// ─── COORDINATE CACHE ────────────────────────────────────────────────
+model Coordinate {
+   id          String   @id @default(uuid())
+   hotelName   String
+   starRating  String?
+   address     String   @unique
+   coordinate String? 
+   latitude    Float
+   longitude   Float
+   createdAt   DateTime @default(now())
+   updatedAt   DateTime @updatedAt
+
+  @@index([latitude, longitude])
+}
+
+// ─── FINAL BOOKING MODEL ─────────────────────────────────────────────
+model Booking {
+  id           String        @id @default(uuid())
+  bookingRef   String        @unique
+  provider     String
+  status       BookingStatus @default(PENDING)
+
+  // Geocoding details
+  address      String?
+  latitude     Float?
+  longitude    Float?
+  
+  // Timings
+  startingDate DateTime?
+
+  // Passenger Details Extracted From Payload
+  customerName String?
+  hotelName    String?
+  phone        String?
+  mail         String?       
+  totalPax     Int           @default(0)
+  paxDetail    String?         
+
+  // Enums & Dynamic Names
+  tourType     TourType?    
+  tourName     String?       
+  payment      PaymentStatus? @default(PENDING)
+
+  // Core Audit Relation (The only remaining connection!)
+  rawDataId    String?        @unique
+  rawData      RawData?       @relation(fields: [rawDataId], references: [id])
+  
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // 🎯 Add these operational fields right here:
+  vehicleId    String?       // Tracks which bus layout container this booking belongs to
+
+  // 🔗 Establish the relation link to the Assignment model
+  assignment   Assignment[]
+}
+//__________________________________________________
+
+model Assignment {
+  id            String   @id @default(uuid())
+  vehicleId     String 
+  sequenceIndex Int     // This defines the "Lane Position"
+
+  bookingId     String  
+  booking       Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+}
+//_______________________________________________________
+
+model AuditLog {
+  id         String   @id @default(uuid())
+
+  entityType String   // Booking, Coordinate, RawData
+  entityId   String
+
+  action     String   // CREATE, UPDATE, DELETE, ASSIGN
+
+  beforeData Json?
+  afterData  Json?
+
+  changedBy  String?
+
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}

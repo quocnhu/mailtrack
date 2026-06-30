@@ -22,117 +22,198 @@ enum PaymentStatus {
 enum BookingStatus {
   PENDING
   ASSIGNED
-  CANCELED 
+  CANCELED
 }
 
-// ─── GMAIL ACCOUNT MODEL ─────────────────────────────────────────────
-model GmailAccount {
-  id              String       @id @default(uuid())
-  email           String       @unique
-  lastHistoryId   String
-  watchExpiration DateTime
-  refreshToken    String
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+enum AssignmentStatus {
+  DRAFT
+  DISPATCHED
+  COMPLETED
+  CANCELED
 }
 
-// ─── RAW DATA LANDING PAD ────────────────────────────────────────────
-model RawData {
-  id        String   @id @default(uuid())
-  sourceId  String   @unique
-  payload   Json
-  status    String   // 'PENDING', 'PROCESSED', 'FAILED'
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // 1-to-1 link forward to the final Booking record
-  booking   Booking?
+enum Role {
+  ADMIN
+  OFFICE
+  TOURGUIDE_OFFICIAL
+  TOURGUIDE_FREELANCER
+  DRIVER
+  TRANSPORT_PROVIDER
 }
 
-// ─── COORDINATE CACHE ────────────────────────────────────────────────
-model Coordinate {
-   id          String   @id @default(uuid())
-   hotelName   String
-   starRating  String?
-   address     String   @unique
-   coordinate String? 
-   latitude    Float
-   longitude   Float
-   createdAt   DateTime @default(now())
-   updatedAt   DateTime @updatedAt
-
-  @@index([latitude, longitude])
+// ─── AUTH & USER PROFILES ─────────────────────────────────────────────
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  name         String?
+  passwordHash String
+  role         Role       @default(OFFICE)
+  isActive     Boolean    @default(true)
+  lastLogin    DateTime?
+  
+  providerId   String?
+  provider     TransportationProvider? @relation(fields: [providerId], references: [id])
+  
+  driverProfile   DriverProfile?
+  guideProfile    GuideProfile?
+  
+  driverAssignments Assignment[] @relation("DriverAssignment")
+  guidedAssignments Assignment[] @relation("GuideAssignment")
+  
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
-// ─── FINAL BOOKING MODEL ─────────────────────────────────────────────
+model DriverProfile {
+  id              String  @id @default(uuid())
+  userId          String  @unique
+  user            User    @relation(fields: [userId], references: [id])
+  licenseNumber   String
+  rating          Float   @default(5.0)
+}
+
+model GuideProfile {
+  id              String  @id @default(uuid())
+  userId          String  @unique
+  user            User    @relation(fields: [userId], references: [id])
+  languages       String[]
+  rating          Float   @default(5.0)
+}
+
+// ─── TOUR & LOGISTICS ────────────────────────────────────────────────
+model Tour {
+  id          String       @id @default(uuid())
+  name        String       @unique
+  type        TourType
+  prices      RoutePrice[]
+  bookings    Booking[]
+}
+
+model TransportationProvider {
+  id          String       @id @default(uuid())
+  name        String
+  users       User[]
+  vehicles    Vehicle[]
+  routePrices RoutePrice[]
+}
+
+model Vehicle {
+  id          String                 @id @default(uuid())
+  plateNumber String
+  providerId  String
+  provider    TransportationProvider @relation(fields: [providerId], references: [id])
+  assignments Assignment[]
+}
+
+model RoutePrice {
+  id         String                 @id @default(uuid())
+  tourId     String
+  tour       Tour                   @relation(fields: [tourId], references: [id])
+  providerId String
+  provider   TransportationProvider @relation(fields: [providerId], references: [id])
+  price      Decimal
+  @@unique([tourId, providerId])
+}
+
+// ─── BOOKING & ASSIGNMENT ────────────────────────────────────────────
 model Booking {
   id           String        @id @default(uuid())
   bookingRef   String        @unique
   provider     String
   status       BookingStatus @default(PENDING)
-
-  // Geocoding details
+  tourId       String?
+  tour         Tour?         @relation(fields: [tourId], references: [id])
+  
   address      String?
   latitude     Float?
   longitude    Float?
-  
-  // Timings
   startingDate DateTime?
-
-  // Passenger Details Extracted From Payload
+  
   customerName String?
   hotelName    String?
   phone        String?
   mail         String?       
   totalPax     Int           @default(0)
-  paxDetail    String?         
-
-  // Enums & Dynamic Names
+  paxDetail    String?       
   tourType     TourType?    
   tourName     String?       
   payment      PaymentStatus? @default(PENDING)
-
-  // Core Audit Relation (The only remaining connection!)
-  rawDataId    String?        @unique
-  rawData      RawData?       @relation(fields: [rawDataId], references: [id])
+  
+  rawDataId    String?       @unique
+  rawData      RawData?      @relation(fields: [rawDataId], references: [id])
+  vehicleId    String?       
+  assignment   Assignment[]
   
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
-
-  // 🎯 Add these operational fields right here:
-  vehicleId    String?       // Tracks which bus layout container this booking belongs to
-
-  // 🔗 Establish the relation link to the Assignment model
-  assignment   Assignment[]
 }
-//__________________________________________________
 
 model Assignment {
-  id            String   @id @default(uuid())
-  vehicleId     String 
-  sequenceIndex Int     // This defines the "Lane Position"
-
-  bookingId     String  
-  booking       Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
-
+  id            String           @id @default(uuid())
+  vehicleId     String
+  vehicle       Vehicle          @relation(fields: [vehicleId], references: [id])
+  bookingId     String
+  booking       Booking          @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  
+  driverId      String?
+  driver        User?            @relation("DriverAssignment", fields: [driverId], references: [id])
+  guideId       String?
+  guide         User?            @relation("GuideAssignment", fields: [guideId], references: [id])
+  
+  status        AssignmentStatus @default(DRAFT)
+  sequenceIndex Int              
+  priceOverride Decimal?         
+  feedback      String?          
+  
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
 }
-//_______________________________________________________
+
+// ─── UTILS ───────────────────────────────────────────────────────────
+model GmailAccount {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  lastHistoryId   String
+  watchExpiration DateTime
+  refreshToken    String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model RawData {
+  id        String   @id @default(uuid())
+  sourceId  String   @unique
+  payload   Json
+  status    String  // 'PENDING', 'PROCESSED', 'FAILED'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  booking   Booking?
+}
+
+model Coordinate {
+   id         String   @id @default(uuid())
+   hotelName  String
+   starRating String?
+   address    String   @unique
+   coordinate String? 
+   latitude   Float
+   longitude  Float
+   createdAt  DateTime @default(now())
+   updatedAt  DateTime @updatedAt
+   @@index([latitude, longitude])
+}
 
 model AuditLog {
   id         String   @id @default(uuid())
-
-  entityType String   // Booking, Coordinate, RawData
+  entityType String
   entityId   String
-
-  action     String   // CREATE, UPDATE, DELETE, ASSIGN
-
+  action     String
   beforeData Json?
   afterData  Json?
-
   changedBy  String?
-
+  user       User?    @relation(fields: [changedBy], references: [id])
   createdAt  DateTime @default(now())
-
   @@index([entityType, entityId])
   @@index([createdAt])
 }
